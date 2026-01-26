@@ -58,6 +58,10 @@
     <key>NSLocalNetworkUsageDescription</key>
     <string>This app needs to connect to your Mac to control the cursor and keyboard.</string>
 
+    <!-- Microphone Usage Description (for dictation) -->
+    <key>NSMicrophoneUsageDescription</key>
+    <string>This app uses the microphone to record your voice for dictation. Audio is sent to OpenAI Whisper for transcription.</string>
+
     <!-- Minimum iOS Version -->
     <key>MinimumOSVersion</key>
     <string>18.0</string>

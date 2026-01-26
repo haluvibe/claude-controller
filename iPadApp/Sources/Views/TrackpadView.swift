@@ -36,7 +36,7 @@ struct TrackpadView: View {
 
                     // Bottom toolbar
                     ToolbarView(showKeyboard: $showKeyboard, connectionManager: connectionManager)
-                        .frame(height: 60)
+                        .frame(height: 80)
                         .background(Color(white: 0.1))
                 }
             }
@@ -66,13 +66,19 @@ struct StatusBar: View {
 
             Spacer()
 
-            // Connected Mac name
-            if let macName = connectionManager.connectedMacName {
-                Text(macName)
-                    .font(.system(size: 12))
-                    .foregroundColor(.gray)
-                    .padding(.trailing, 16)
+            // Version and connected Mac name
+            HStack(spacing: 8) {
+                Text("v1.1")
+                    .font(.system(size: 10, weight: .medium, design: .monospaced))
+                    .foregroundColor(.orange)
+
+                if let macName = connectionManager.connectedMacName {
+                    Text(macName)
+                        .font(.system(size: 12))
+                        .foregroundColor(.gray)
+                }
             }
+            .padding(.trailing, 16)
         }
     }
 
@@ -125,47 +131,66 @@ struct TrackpadTouchArea: UIViewRepresentable {
 struct ToolbarView: View {
     @Binding var showKeyboard: Bool
     let connectionManager: ConnectionManager
+    @StateObject private var dictationManager: DictationManager
+
+    init(showKeyboard: Binding<Bool>, connectionManager: ConnectionManager) {
+        self._showKeyboard = showKeyboard
+        self.connectionManager = connectionManager
+        self._dictationManager = StateObject(wrappedValue: DictationManager(
+            connectionManager: connectionManager,
+            apiKey: AppConfig.whisperAPIKey
+        ))
+    }
 
     var body: some View {
-        HStack(spacing: 16) {
-            // Gesture buttons (left side)
-            HStack(spacing: 8) {
-                // Left arrow - Previous space
-                GestureButton(icon: "chevron.left", action: {
-                    connectionManager.sendThreeFingerSwipe(direction: "right")
-                })
+        VStack(spacing: 4) {
+            // Dictation status (shows when active)
+            DictationStatusView(dictationManager: dictationManager)
+                .frame(height: 16)
 
-                // Vertical stack for up/down
-                VStack(spacing: 4) {
-                    // Up arrow - Mission Control
-                    GestureButton(icon: "chevron.up", action: {
-                        connectionManager.sendThreeFingerSwipe(direction: "up")
+            HStack(spacing: 16) {
+                // Gesture buttons (left side)
+                HStack(spacing: 8) {
+                    // Left arrow - Previous space
+                    GestureButton(icon: "chevron.left", action: {
+                        connectionManager.sendThreeFingerSwipe(direction: "right")
                     })
 
-                    // Down arrow - App Exposé
-                    GestureButton(icon: "chevron.down", action: {
-                        connectionManager.sendThreeFingerSwipe(direction: "down")
+                    // Vertical stack for up/down
+                    VStack(spacing: 4) {
+                        // Up arrow - Mission Control
+                        GestureButton(icon: "chevron.up", action: {
+                            connectionManager.sendThreeFingerSwipe(direction: "up")
+                        })
+
+                        // Down arrow - App Exposé
+                        GestureButton(icon: "chevron.down", action: {
+                            connectionManager.sendThreeFingerSwipe(direction: "down")
+                        })
+                    }
+
+                    // Right arrow - Next space
+                    GestureButton(icon: "chevron.right", action: {
+                        connectionManager.sendThreeFingerSwipe(direction: "left")
                     })
                 }
 
-                // Right arrow - Next space
-                GestureButton(icon: "chevron.right", action: {
-                    connectionManager.sendThreeFingerSwipe(direction: "left")
-                })
-            }
+                Spacer()
 
-            Spacer()
+                // Dictation button (microphone)
+                DictationButton(dictationManager: dictationManager)
 
-            // Keyboard toggle button
-            Button(action: {
-                showKeyboard.toggle()
-            }) {
-                Image(systemName: showKeyboard ? "keyboard.chevron.compact.down" : "keyboard")
-                    .font(.system(size: 24))
-                    .foregroundColor(.white)
-                    .frame(width: 60, height: 44)
-                    .background(showKeyboard ? Color.blue : Color(white: 0.25))
-                    .cornerRadius(8)
+                // Keyboard toggle button
+                Button(action: {
+                    showKeyboard.toggle()
+                }) {
+                    Image(systemName: showKeyboard ? "keyboard.chevron.compact.down" : "keyboard")
+                        .font(.system(size: 24))
+                        .foregroundColor(.white)
+                        .frame(width: 60, height: 44)
+                        .background(showKeyboard ? Color.blue : Color(white: 0.25))
+                        .cornerRadius(8)
+                }
             }
         }
         .padding(.horizontal, 16)

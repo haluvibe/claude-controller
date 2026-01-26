@@ -12,6 +12,11 @@
 		AAA00003 /* KeyboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBB00003 /* KeyboardView.swift */; };
 		AAA00004 /* GestureHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBB00004 /* GestureHandler.swift */; };
 		AAA00005 /* ConnectionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBB00005 /* ConnectionManager.swift */; };
+		AAA00006 /* WhisperService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBB00007 /* WhisperService.swift */; };
+		AAA00007 /* AudioRecorder.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBB00008 /* AudioRecorder.swift */; };
+		AAA00008 /* DictationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBB00009 /* DictationManager.swift */; };
+		AAA00009 /* AppConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBB00010 /* AppConfig.swift */; };
+		AAA00010 /* DictationButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBB00011 /* DictationButton.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -21,6 +26,11 @@
 		BBB00004 /* GestureHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GestureHandler.swift; sourceTree = "<group>"; };
 		BBB00005 /* ConnectionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectionManager.swift; sourceTree = "<group>"; };
 		BBB00006 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		BBB00007 /* WhisperService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WhisperService.swift; sourceTree = "<group>"; };
+		BBB00008 /* AudioRecorder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioRecorder.swift; sourceTree = "<group>"; };
+		BBB00009 /* DictationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DictationManager.swift; sourceTree = "<group>"; };
+		BBB00010 /* AppConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppConfig.swift; sourceTree = "<group>"; };
+		BBB00011 /* DictationButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DictationButton.swift; sourceTree = "<group>"; };
 		CCC00001 /* TrackpadController.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TrackpadController.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -48,9 +58,11 @@
 			isa = PBXGroup;
 			children = (
 				EEE00003 /* App */,
-				EEE00004 /* Views */,
+				EEE00008 /* Audio */,
+				EEE00009 /* Config */,
 				EEE00005 /* Input */,
 				EEE00007 /* Network */,
+				EEE00004 /* Views */,
 			);
 			path = Sources;
 			sourceTree = "<group>";
@@ -66,8 +78,9 @@
 		EEE00004 /* Views */ = {
 			isa = PBXGroup;
 			children = (
-				BBB00002 /* TrackpadView.swift */,
+				BBB00011 /* DictationButton.swift */,
 				BBB00003 /* KeyboardView.swift */,
+				BBB00002 /* TrackpadView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -94,6 +107,24 @@
 				BBB00005 /* ConnectionManager.swift */,
 			);
 			path = Network;
+			sourceTree = "<group>";
+		};
+		EEE00008 /* Audio */ = {
+			isa = PBXGroup;
+			children = (
+				BBB00008 /* AudioRecorder.swift */,
+				BBB00009 /* DictationManager.swift */,
+				BBB00007 /* WhisperService.swift */,
+			);
+			path = Audio;
+			sourceTree = "<group>";
+		};
+		EEE00009 /* Config */ = {
+			isa = PBXGroup;
+			children = (
+				BBB00010 /* AppConfig.swift */,
+			);
+			path = Config;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -169,6 +200,11 @@
 				AAA00003 /* KeyboardView.swift in Sources */,
 				AAA00004 /* GestureHandler.swift in Sources */,
 				AAA00005 /* ConnectionManager.swift in Sources */,
+				AAA00006 /* WhisperService.swift in Sources */,
+				AAA00007 /* AudioRecorder.swift in Sources */,
+				AAA00008 /* DictationManager.swift in Sources */,
+				AAA00009 /* AppConfig.swift in Sources */,
+				AAA00010 /* DictationButton.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

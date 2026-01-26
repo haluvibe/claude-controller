@@ -30,3 +30,4 @@ macOS/ClaudeController.app/Contents/MacOS/ClaudeController
 
 # Logs
 *.log
+.env.local
