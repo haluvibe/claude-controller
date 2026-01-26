@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <!-- Bundle Identification -->
+    <key>CFBundleIdentifier</key>
+    <string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+
+    <key>CFBundleName</key>
+    <string>Claude Controller</string>
+
+    <key>CFBundleDisplayName</key>
+    <string>Claude Controller</string>
+
+    <key>CFBundleExecutable</key>
+    <string>$(EXECUTABLE_NAME)</string>
+
+    <key>CFBundlePackageType</key>
+    <string>APPL</string>
+
+    <!-- Version Information -->
+    <key>CFBundleShortVersionString</key>
+    <string>1.0.0</string>
+
+    <key>CFBundleVersion</key>
+    <string>1</string>
+
+    <!-- macOS 15+ Sequoia Required -->
+    <key>LSMinimumSystemVersion</key>
+    <string>15.0</string>
+
+    <!-- App Category -->
+    <key>LSApplicationCategoryType</key>
+    <string>public.app-category.utilities</string>
+
+    <!-- UI Configuration -->
+    <key>LSUIElement</key>
+    <true/>
+
+    <key>NSPrincipalClass</key>
+    <string>NSApplication</string>
+
+    <!-- Required for SwiftUI lifecycle -->
+    <key>NSHighResolutionCapable</key>
+    <true/>
+
+    <key>NSSupportsAutomaticTermination</key>
+    <true/>
+
+    <key>NSSupportsSuddenTermination</key>
+    <false/>
+
+    <!-- Privacy Permission Descriptions -->
+
+    <!-- Accessibility Permission (Required) -->
+    <key>NSAccessibilityUsageDescription</key>
+    <string>Claude Controller needs Accessibility permission to control your cursor and keyboard based on input from your iPad. This allows your iPad to function as a wireless trackpad.</string>
+
+    <!-- Local Network Permission (Required) -->
+    <key>NSLocalNetworkUsageDescription</key>
+    <string>Claude Controller needs to access your local network to discover and connect to the Claude Controller app on your iPad. All communication stays on your local network.</string>
+
+    <!-- Bonjour Services -->
+    <key>NSBonjourServices</key>
+    <array>
+        <string>_claudecontrol._tcp</string>
+    </array>
+
+    <!-- AppleEvents for System Gestures (Optional) -->
+    <key>NSAppleEventsUsageDescription</key>
+    <string>Claude Controller may use AppleEvents to trigger system gestures like Mission Control when you use multi-finger swipes on your iPad.</string>
+
+    <!-- Hardened Runtime -->
+    <key>NSAppTransportSecurity</key>
+    <dict>
+        <!-- Local network only - no external connections -->
+        <key>NSAllowsLocalNetworking</key>
+        <true/>
+
+        <key>NSAllowsArbitraryLoads</key>
+        <false/>
+    </dict>
+
+    <!-- Launch at Login Support (macOS 13+) -->
+    <key>BGTaskSchedulerPermittedIdentifiers</key>
+    <array>
+        <string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+    </array>
+
+    <!-- Document Types (None) -->
+    <key>CFBundleDocumentTypes</key>
+    <array/>
+
+    <!-- URL Schemes (None) -->
+    <key>CFBundleURLTypes</key>
+    <array/>
+
+    <!-- File Provider (None) -->
+    <key>NSExtension</key>
+    <dict/>
+
+    <!-- Copyright -->
+    <key>NSHumanReadableCopyright</key>
+    <string>Copyright 2024. All rights reserved.</string>
+</dict>
+</plist>

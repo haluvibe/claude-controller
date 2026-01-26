@@ -1,0 +1,29 @@
+# macOS
+.DS_Store
+*.swp
+
+# Xcode
+*.xcuserstate
+xcuserdata/
+DerivedData/
+*.xcworkspace/xcuserdata/
+
+# Swift Package Manager
+.build/
+.swiftpm/
+Packages/
+
+# Node
+node_modules/
+
+# Claude Flow (local state)
+.claude-flow/
+.swarm/
+.claude/
+
+# Build artifacts
+*.app
+!macOS/ClaudeController.app/
+
+# Logs
+*.log

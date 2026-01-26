@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <!--
+    IMPORTANT: App Sandbox Incompatibility
+
+    This app CANNOT be sandboxed because:
+    1. CGEvent APIs for input injection require unsandboxed access
+    2. Accessibility APIs require direct system access
+    3. IOKit for display configuration requires unsandboxed access
+
+    Distribution: Direct distribution (notarized) only, NOT Mac App Store
+    -->
+
+    <!-- App Sandbox DISABLED for input injection capabilities -->
+    <key>com.apple.security.app-sandbox</key>
+    <false/>
+
+    <!-- Hardened Runtime Required for Notarization -->
+    <!-- The following are the minimum required exceptions -->
+
+    <!-- No JIT or unsigned memory needed -->
+    <key>com.apple.security.cs.allow-jit</key>
+    <false/>
+
+    <key>com.apple.security.cs.allow-unsigned-executable-memory</key>
+    <false/>
+
+    <!-- No dylib injection needed -->
+    <key>com.apple.security.cs.disable-library-validation</key>
+    <false/>
+
+    <!-- No DYLD environment variables needed -->
+    <key>com.apple.security.cs.allow-dyld-environment-variables</key>
+    <false/>
+
+    <!--
+    Network entitlements for Bonjour service
+    Note: These are informational when sandbox is disabled
+    but kept for documentation purposes
+    -->
+
+    <!-- Allow incoming network connections (Bonjour listener) -->
+    <key>com.apple.security.network.server</key>
+    <true/>
+
+    <!-- Allow outgoing network connections -->
+    <key>com.apple.security.network.client</key>
+    <true/>
+</dict>
+</plist>

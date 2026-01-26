@@ -1,0 +1,386 @@
+// ConnectionManager.swift
+// iPad Trackpad Controller - Bonjour + TCP Client
+// iOS 18+ / iPadOS 18+
+
+import Foundation
+import Network
+import Combine
+import UIKit
+
+/// Connection state for UI updates
+enum ConnectionState: Equatable {
+    case disconnected
+    case connecting
+    case connected
+    case error(String)
+}
+
+/// Manages network connection to the Mac helper app via Bonjour
+@MainActor
+class ConnectionManager: ObservableObject {
+
+    // MARK: - Published Properties
+
+    @Published private(set) var connectionState: ConnectionState = .disconnected
+    @Published private(set) var isConnected: Bool = false
+    @Published private(set) var connectedMacName: String?
+
+    // MARK: - Private Properties
+
+    private var browser: NWBrowser?
+    private var connection: NWConnection?
+    private var discoveredEndpoint: NWEndpoint?
+
+    private let serviceType = "_claudecontrol._tcp"
+    private let queue = DispatchQueue(label: "com.claudecontroller.ipad.network", qos: .userInteractive)
+
+    private var reconnectAttempts = 0
+    private let maxReconnectAttempts = 5
+    private var reconnectTask: Task<Void, Never>?
+
+    // Message batching
+    private var pendingMessages: [ControlMessage] = []
+    private var batchTimer: Timer?
+    private let batchInterval: TimeInterval = 0.008 // ~120Hz for smooth cursor
+
+    // MARK: - Initialization
+
+    init() {
+        startBrowsing()
+        setupBatchTimer()
+    }
+
+    deinit {
+        batchTimer?.invalidate()
+        browser?.cancel()
+        connection?.cancel()
+    }
+
+    // MARK: - Service Discovery
+
+    private func startBrowsing() {
+        connectionState = .disconnected
+
+        let parameters = NWParameters()
+        parameters.includePeerToPeer = true
+
+        browser = NWBrowser(for: .bonjour(type: serviceType, domain: "local."), using: parameters)
+
+        browser?.stateUpdateHandler = { [weak self] state in
+            Task { @MainActor in
+                self?.handleBrowserStateChange(state)
+            }
+        }
+
+        browser?.browseResultsChangedHandler = { [weak self] results, changes in
+            Task { @MainActor in
+                self?.handleBrowseResults(results)
+            }
+        }
+
+        browser?.start(queue: queue)
+        print("[ConnectionManager] Started browsing for \(serviceType)")
+    }
+
+    private func handleBrowserStateChange(_ state: NWBrowser.State) {
+        switch state {
+        case .ready:
+            print("[ConnectionManager] Browser ready")
+        case .failed(let error):
+            print("[ConnectionManager] Browser failed: \(error)")
+            connectionState = .error("Discovery failed")
+        case .cancelled:
+            print("[ConnectionManager] Browser cancelled")
+        default:
+            break
+        }
+    }
+
+    private func handleBrowseResults(_ results: Set<NWBrowser.Result>) {
+        print("[ConnectionManager] Found \(results.count) services")
+
+        // Connect to first discovered service
+        if let result = results.first {
+            if case .service(let name, _, _, _) = result.endpoint {
+                print("[ConnectionManager] Discovered Mac: \(name)")
+                connectedMacName = name
+            }
+
+            // Only connect if not already connected
+            if connection == nil || connectionState != .connected {
+                discoveredEndpoint = result.endpoint
+                connect(to: result.endpoint)
+            }
+        }
+    }
+
+    // MARK: - Connection Management
+
+    private func connect(to endpoint: NWEndpoint) {
+        connectionState = .connecting
+
+        let tcpOptions = NWProtocolTCP.Options()
+        tcpOptions.enableKeepalive = true
+        tcpOptions.keepaliveInterval = 30
+        tcpOptions.keepaliveCount = 3
+        tcpOptions.noDelay = true  // Low latency
+
+        let parameters = NWParameters(tls: nil, tcp: tcpOptions)
+        parameters.includePeerToPeer = true
+
+        connection = NWConnection(to: endpoint, using: parameters)
+
+        connection?.stateUpdateHandler = { [weak self] state in
+            Task { @MainActor in
+                self?.handleConnectionStateChange(state)
+            }
+        }
+
+        connection?.start(queue: queue)
+    }
+
+    private func handleConnectionStateChange(_ state: NWConnection.State) {
+        switch state {
+        case .ready:
+            print("[ConnectionManager] Connected!")
+            connectionState = .connected
+            isConnected = true
+            reconnectAttempts = 0
+            startReceiving()
+            sendHandshake()
+
+        case .waiting(let error):
+            print("[ConnectionManager] Waiting: \(error)")
+            connectionState = .connecting
+
+        case .failed(let error):
+            print("[ConnectionManager] Failed: \(error)")
+            isConnected = false
+            handleConnectionFailure()
+
+        case .cancelled:
+            print("[ConnectionManager] Cancelled")
+            isConnected = false
+            connectionState = .disconnected
+
+        default:
+            break
+        }
+    }
+
+    private func handleConnectionFailure() {
+        guard reconnectAttempts < maxReconnectAttempts else {
+            connectionState = .error("Connection failed")
+            return
+        }
+
+        reconnectAttempts += 1
+        connectionState = .connecting
+
+        // Exponential backoff
+        let delay = pow(2.0, Double(reconnectAttempts))
+
+        reconnectTask?.cancel()
+        reconnectTask = Task {
+            try? await Task.sleep(nanoseconds: UInt64(delay * 1_000_000_000))
+
+            if let endpoint = discoveredEndpoint {
+                connect(to: endpoint)
+            } else {
+                // Restart browsing
+                startBrowsing()
+            }
+        }
+    }
+
+    func disconnect() {
+        reconnectTask?.cancel()
+        connection?.cancel()
+        connection = nil
+        isConnected = false
+        connectionState = .disconnected
+    }
+
+    // MARK: - Receiving
+
+    private func startReceiving() {
+        receiveNextMessage()
+    }
+
+    private func receiveNextMessage() {
+        connection?.receive(minimumIncompleteLength: 1, maximumLength: 65536) { [weak self] content, _, isComplete, error in
+            Task { @MainActor in
+                if let data = content {
+                    self?.handleReceivedData(data)
+                }
+
+                if let error = error {
+                    print("[ConnectionManager] Receive error: \(error)")
+                    return
+                }
+
+                if !isComplete {
+                    self?.receiveNextMessage()
+                }
+            }
+        }
+    }
+
+    private func handleReceivedData(_ data: Data) {
+        // Handle server responses (ack, config, etc.)
+        // For MVP, we mainly care about sending data, not receiving
+        if let response = try? JSONDecoder().decode(ServerResponse.self, from: data) {
+            switch response.type {
+            case "handshake_ack":
+                print("[ConnectionManager] Handshake acknowledged")
+            case "pong":
+                print("[ConnectionManager] Pong received")
+            default:
+                break
+            }
+        }
+    }
+
+    // MARK: - Sending
+
+    private func sendHandshake() {
+        let deviceName = UIDevice.current.name
+        let handshake: [String: Any] = [
+            "type": "handshake",
+            "name": deviceName,
+            "version": "1.0.0"
+        ]
+
+        if let data = try? JSONSerialization.data(withJSONObject: handshake) {
+            sendRaw(data)
+        }
+    }
+
+    private func setupBatchTimer() {
+        batchTimer = Timer.scheduledTimer(withTimeInterval: batchInterval, repeats: true) { [weak self] _ in
+            Task { @MainActor in
+                self?.flushPendingMessages()
+            }
+        }
+    }
+
+    private func flushPendingMessages() {
+        guard !pendingMessages.isEmpty, connection?.state == .ready else { return }
+
+        let messages = pendingMessages
+        pendingMessages.removeAll()
+
+        // Batch encode and send
+        let batch = MessageBatch(messages: messages, timestamp: Date().timeIntervalSince1970)
+
+        if let data = try? JSONEncoder().encode(batch) {
+            sendRaw(data)
+        }
+    }
+
+    private func sendRaw(_ data: Data) {
+        // Add length prefix for framing
+        var length = UInt32(data.count).bigEndian
+        var framedData = Data(bytes: &length, count: 4)
+        framedData.append(data)
+
+        connection?.send(content: framedData, completion: .contentProcessed { error in
+            if let error = error {
+                print("[ConnectionManager] Send error: \(error)")
+            }
+        })
+    }
+
+    private func queueMessage(_ message: ControlMessage) {
+        pendingMessages.append(message)
+    }
+
+    // MARK: - Public API - Mouse Control
+
+    func sendMouseMove(deltaX: CGFloat, deltaY: CGFloat) {
+        queueMessage(ControlMessage(
+            type: .mouseMove,
+            deltaX: Double(deltaX),
+            deltaY: Double(deltaY)
+        ))
+    }
+
+    func sendClick() {
+        queueMessage(ControlMessage(type: .leftClick))
+    }
+
+    func sendRightClick() {
+        queueMessage(ControlMessage(type: .rightClick))
+    }
+
+    func sendDoubleClick() {
+        queueMessage(ControlMessage(type: .doubleClick))
+    }
+
+    func sendScroll(deltaX: CGFloat, deltaY: CGFloat) {
+        queueMessage(ControlMessage(
+            type: .scroll,
+            deltaX: Double(deltaX),
+            deltaY: Double(deltaY)
+        ))
+    }
+
+    // MARK: - Public API - Keyboard
+
+    func sendKeyDown(keyCode: UInt16, modifiers: UInt32 = 0) {
+        queueMessage(ControlMessage(
+            type: .keyDown,
+            keyCode: keyCode,
+            modifiers: modifiers
+        ))
+    }
+
+    func sendKeyUp(keyCode: UInt16, modifiers: UInt32 = 0) {
+        queueMessage(ControlMessage(
+            type: .keyUp,
+            keyCode: keyCode,
+            modifiers: modifiers
+        ))
+    }
+
+    func sendKeyPress(keyCode: UInt16, modifiers: UInt32 = 0) {
+        queueMessage(ControlMessage(
+            type: .keyPress,
+            keyCode: keyCode,
+            modifiers: modifiers
+        ))
+    }
+}
+
+// MARK: - Message Types
+
+struct ControlMessage: Codable {
+    let type: MessageType
+    var deltaX: Double?
+    var deltaY: Double?
+    var keyCode: UInt16?
+    var modifiers: UInt32?
+    var text: String?
+
+    enum MessageType: String, Codable {
+        case mouseMove
+        case leftClick
+        case rightClick
+        case doubleClick
+        case scroll
+        case keyDown
+        case keyUp
+        case keyPress
+        case text
+    }
+}
+
+struct MessageBatch: Codable {
+    let messages: [ControlMessage]
+    let timestamp: Double
+}
+
+struct ServerResponse: Codable {
+    let type: String
+    var message: String?
+}
