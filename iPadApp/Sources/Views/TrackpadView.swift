@@ -27,8 +27,10 @@ struct TrackpadView: View {
 
                     // Keyboard (shown/hidden)
                     if showKeyboard {
-                        KeyboardView(connectionManager: connectionManager)
-                            .frame(height: 280)
+                        KeyboardView(connectionManager: connectionManager, onDismiss: {
+                            showKeyboard = false
+                        })
+                            .frame(height: 300)
                             .transition(.move(edge: .bottom))
                     }
 
