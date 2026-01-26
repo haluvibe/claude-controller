@@ -5,7 +5,7 @@
       location = "group:iPadApp/TrackpadController.xcodeproj">
    </FileRef>
    <FileRef
-      location = "group:macOS/ClaudeController">
+      location = "group:macOS/ClaudeController/ClaudeController.xcodeproj">
    </FileRef>
    <FileRef
       location = "group:Shared">

@@ -33,7 +33,7 @@ struct TrackpadView: View {
                     }
 
                     // Bottom toolbar
-                    ToolbarView(showKeyboard: $showKeyboard)
+                    ToolbarView(showKeyboard: $showKeyboard, connectionManager: connectionManager)
                         .frame(height: 60)
                         .background(Color(white: 0.1))
                 }
@@ -107,6 +107,9 @@ struct TrackpadTouchArea: UIViewRepresentable {
         view.onScroll = { deltaX, deltaY in
             connectionManager.sendScroll(deltaX: deltaX, deltaY: deltaY)
         }
+        view.onThreeFingerSwipe = { direction in
+            connectionManager.sendThreeFingerSwipe(direction: direction.rawValue)
+        }
         return view
     }
 
@@ -119,9 +122,36 @@ struct TrackpadTouchArea: UIViewRepresentable {
 
 struct ToolbarView: View {
     @Binding var showKeyboard: Bool
+    let connectionManager: ConnectionManager
 
     var body: some View {
-        HStack {
+        HStack(spacing: 16) {
+            // Gesture buttons (left side)
+            HStack(spacing: 8) {
+                // Left arrow - Previous space
+                GestureButton(icon: "chevron.left", action: {
+                    connectionManager.sendThreeFingerSwipe(direction: "right")
+                })
+
+                // Vertical stack for up/down
+                VStack(spacing: 4) {
+                    // Up arrow - Mission Control
+                    GestureButton(icon: "chevron.up", action: {
+                        connectionManager.sendThreeFingerSwipe(direction: "up")
+                    })
+
+                    // Down arrow - App Exposé
+                    GestureButton(icon: "chevron.down", action: {
+                        connectionManager.sendThreeFingerSwipe(direction: "down")
+                    })
+                }
+
+                // Right arrow - Next space
+                GestureButton(icon: "chevron.right", action: {
+                    connectionManager.sendThreeFingerSwipe(direction: "left")
+                })
+            }
+
             Spacer()
 
             // Keyboard toggle button
@@ -135,10 +165,26 @@ struct ToolbarView: View {
                     .background(showKeyboard ? Color.blue : Color(white: 0.25))
                     .cornerRadius(8)
             }
-
-            Spacer()
         }
         .padding(.horizontal, 16)
+    }
+}
+
+// MARK: - Gesture Button
+
+struct GestureButton: View {
+    let icon: String
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            Image(systemName: icon)
+                .font(.system(size: 18, weight: .semibold))
+                .foregroundColor(.white)
+                .frame(width: 44, height: 44)
+                .background(Color(white: 0.25))
+                .cornerRadius(8)
+        }
     }
 }
 

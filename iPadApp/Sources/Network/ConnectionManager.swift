@@ -350,6 +350,12 @@ class ConnectionManager: ObservableObject {
             modifiers: modifiers
         ))
     }
+
+    func sendThreeFingerSwipe(direction: String) {
+        var message = ControlMessage(type: .threeFingerSwipe)
+        message.swipeDirection = direction
+        queueMessage(message)
+    }
 }
 
 // MARK: - Message Types
@@ -372,7 +378,10 @@ struct ControlMessage: Codable {
         case keyUp
         case keyPress
         case text
+        case threeFingerSwipe
     }
+
+    var swipeDirection: String?
 }
 
 struct MessageBatch: Codable {

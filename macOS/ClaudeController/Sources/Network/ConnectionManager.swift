@@ -28,7 +28,10 @@ struct ControlMessage: Codable, Sendable {
         case keyUp
         case keyPress
         case text
+        case threeFingerSwipe
     }
+
+    var swipeDirection: String?
 }
 
 // MARK: - Connection Manager
@@ -310,6 +313,11 @@ final class ConnectionManager: ObservableObject {
         case .text:
             if let text = message.text {
                 injector.typeText(text)
+            }
+
+        case .threeFingerSwipe:
+            if let direction = message.swipeDirection {
+                injector.threeFingerSwipe(direction: direction)
             }
         }
     }

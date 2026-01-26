@@ -172,6 +172,43 @@ final class InputInjector {
         }
     }
 
+    // MARK: - Three-Finger Swipe Gestures
+
+    func threeFingerSwipe(direction: String) {
+        // Use keyboard shortcuts to trigger system gestures
+        // These match the default macOS trackpad gestures:
+        // - Left/Right: Switch spaces (Control + Arrow)
+        // - Up: Mission Control (Control + Up)
+        // - Down: App Exposé (Control + Down)
+
+        // Arrow keys need both Control (0x40000) and NumericPad (0x800000) flags
+        // macOS expects modifiers = 0x840000 = 8650752 for arrow key shortcuts
+        let controlModifier = UInt32(CGEventFlags.maskControl.rawValue)
+        let numericPadFlag: UInt32 = 0x800000  // Numeric pad indicator for arrow keys
+        let arrowKeyModifiers = controlModifier | numericPadFlag
+
+        switch direction {
+        case "left":
+            // Swipe left = move to right space (Control + Right Arrow)
+            keyPress(keyCode: 124, modifiers: arrowKeyModifiers)
+
+        case "right":
+            // Swipe right = move to left space (Control + Left Arrow)
+            keyPress(keyCode: 123, modifiers: arrowKeyModifiers)
+
+        case "up":
+            // Swipe up = Mission Control (Control + Up Arrow)
+            keyPress(keyCode: 126, modifiers: arrowKeyModifiers)
+
+        case "down":
+            // Swipe down = App Exposé (Control + Down Arrow)
+            keyPress(keyCode: 125, modifiers: arrowKeyModifiers)
+
+        default:
+            print("⚠️ Unknown swipe direction: \(direction)")
+        }
+    }
+
     // MARK: - Helpers
 
     private func mouseEventTypes(for button: MouseButton) -> (CGEventType, CGEventType, CGMouseButton) {
