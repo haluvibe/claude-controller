@@ -1,16 +1,15 @@
 # macOS
-.DS_Store
+**/.DS_Store
 *.swp
 
 # Xcode
-*.xcuserstate
-xcuserdata/
-DerivedData/
-*.xcworkspace/xcuserdata/
+**/*.xcuserstate
+**/xcuserdata/
+**/DerivedData/
 
 # Swift Package Manager
-.build/
-.swiftpm/
+**/.build/
+**/.swiftpm/
 Packages/
 
 # Node
