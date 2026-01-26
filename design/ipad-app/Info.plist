@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <!-- App Identification -->
+    <key>CFBundleDevelopmentRegion</key>
+    <string>en</string>
+    <key>CFBundleDisplayName</key>
+    <string>Claude Controller</string>
+    <key>CFBundleExecutable</key>
+    <string>$(EXECUTABLE_NAME)</string>
+    <key>CFBundleIdentifier</key>
+    <string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+    <key>CFBundleInfoDictionaryVersion</key>
+    <string>6.0</string>
+    <key>CFBundleName</key>
+    <string>$(PRODUCT_NAME)</string>
+    <key>CFBundlePackageType</key>
+    <string>APPL</string>
+    <key>CFBundleShortVersionString</key>
+    <string>1.0</string>
+    <key>CFBundleVersion</key>
+    <string>1</string>
+
+    <!-- iOS Version Requirements -->
+    <key>MinimumOSVersion</key>
+    <string>18.0</string>
+    <key>LSRequiresIPhoneOS</key>
+    <true/>
+
+    <!-- Device Requirements -->
+    <key>UIRequiredDeviceCapabilities</key>
+    <array>
+        <string>wifi</string>
+        <string>arm64</string>
+    </array>
+
+    <!-- Supported Interface Orientations -->
+    <key>UISupportedInterfaceOrientations</key>
+    <array>
+        <string>UIInterfaceOrientationPortrait</string>
+        <string>UIInterfaceOrientationPortraitUpsideDown</string>
+        <string>UIInterfaceOrientationLandscapeLeft</string>
+        <string>UIInterfaceOrientationLandscapeRight</string>
+    </array>
+    <key>UISupportedInterfaceOrientations~ipad</key>
+    <array>
+        <string>UIInterfaceOrientationPortrait</string>
+        <string>UIInterfaceOrientationPortraitUpsideDown</string>
+        <string>UIInterfaceOrientationLandscapeLeft</string>
+        <string>UIInterfaceOrientationLandscapeRight</string>
+    </array>
+
+    <!-- iPad Multitasking Support -->
+    <key>UIRequiresFullScreen</key>
+    <false/>
+    <key>UISupportsDocumentBrowser</key>
+    <false/>
+
+    <!-- Scene Configuration -->
+    <key>UIApplicationSceneManifest</key>
+    <dict>
+        <key>UIApplicationSupportsMultipleScenes</key>
+        <true/>
+        <key>UISceneConfigurations</key>
+        <dict>
+            <key>UIWindowSceneSessionRoleApplication</key>
+            <array>
+                <dict>
+                    <key>UISceneConfigurationName</key>
+                    <string>Default Configuration</string>
+                    <key>UISceneDelegateClassName</key>
+                    <string>$(PRODUCT_MODULE_NAME).SceneDelegate</string>
+                </dict>
+            </array>
+        </dict>
+    </dict>
+
+    <!-- Background Modes -->
+    <key>UIBackgroundModes</key>
+    <array>
+        <!-- Keep network connection alive in background -->
+        <string>processing</string>
+        <!-- For Bonjour service discovery -->
+        <string>fetch</string>
+    </array>
+
+    <!-- Network Permissions -->
+    <key>NSLocalNetworkUsageDescription</key>
+    <string>Claude Controller needs to access your local network to discover and connect to your Mac.</string>
+
+    <!-- Bonjour Services -->
+    <key>NSBonjourServices</key>
+    <array>
+        <string>_claude-controller._tcp</string>
+    </array>
+
+    <!-- Privacy Descriptions -->
+    <key>NSBluetoothAlwaysUsageDescription</key>
+    <string>Claude Controller can use Bluetooth to discover nearby Macs when Wi-Fi discovery is unavailable.</string>
+    <key>NSBluetoothPeripheralUsageDescription</key>
+    <string>Claude Controller can use Bluetooth to discover nearby Macs when Wi-Fi discovery is unavailable.</string>
+
+    <!-- App Transport Security -->
+    <key>NSAppTransportSecurity</key>
+    <dict>
+        <key>NSAllowsLocalNetworking</key>
+        <true/>
+    </dict>
+
+    <!-- URL Schemes for Deep Linking -->
+    <key>CFBundleURLTypes</key>
+    <array>
+        <dict>
+            <key>CFBundleURLName</key>
+            <string>com.claudecontroller.ios</string>
+            <key>CFBundleURLSchemes</key>
+            <array>
+                <string>claude-controller</string>
+            </array>
+        </dict>
+    </array>
+
+    <!-- Launch Screen -->
+    <key>UILaunchStoryboardName</key>
+    <string>LaunchScreen</string>
+
+    <!-- Status Bar -->
+    <key>UIStatusBarStyle</key>
+    <string>UIStatusBarStyleDefault</string>
+    <key>UIViewControllerBasedStatusBarAppearance</key>
+    <true/>
+
+    <!-- Apple Pencil Support -->
+    <key>UISupportsPencilInput</key>
+    <true/>
+
+    <!-- Keyboard Extension Support -->
+    <key>UISupportsExternalKeyboard</key>
+    <true/>
+
+    <!-- Stage Manager Support (iPadOS 16+) -->
+    <key>UIApplicationSupportsIndependentFullScreen</key>
+    <true/>
+
+    <!-- Scene Restoration -->
+    <key>UIApplicationSupportsSceneActivationConditions</key>
+    <true/>
+
+    <!-- Accessibility -->
+    <key>UIAccessibilitySupportsAutomaticSwitchControl</key>
+    <true/>
+</dict>
+</plist>

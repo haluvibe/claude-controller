@@ -15,15 +15,19 @@ Packages/
 
 # Node
 node_modules/
+package.json
+package-lock.json
 
 # Claude Flow (local state)
 .claude-flow/
 .swarm/
 .claude/
 
-# Build artifacts
-*.app
-!macOS/ClaudeController.app/
+# MCP config (local)
+.mcp.json
+
+# Build artifacts - keep .app bundle structure but ignore compiled binary
+macOS/ClaudeController.app/Contents/MacOS/ClaudeController
 
 # Logs
 *.log

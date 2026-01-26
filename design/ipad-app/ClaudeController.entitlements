@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <!-- App Groups for shared data (if companion watchOS app needed) -->
+    <key>com.apple.security.application-groups</key>
+    <array>
+        <string>group.com.claudecontroller.shared</string>
+    </array>
+
+    <!-- Keychain Access for storing connection credentials securely -->
+    <key>keychain-access-groups</key>
+    <array>
+        <string>$(AppIdentifierPrefix)com.claudecontroller.ios</string>
+    </array>
+
+    <!-- Network Extensions (for advanced network features) -->
+    <key>com.apple.developer.networking.networkextension</key>
+    <array>
+        <string>dns-proxy</string>
+    </array>
+
+    <!-- Multicast Networking (for Bonjour) -->
+    <key>com.apple.developer.networking.multicast</key>
+    <true/>
+
+    <!-- Associated Domains (for Universal Links) -->
+    <key>com.apple.developer.associated-domains</key>
+    <array>
+        <string>applinks:claudecontroller.app</string>
+    </array>
+
+    <!-- Push Notifications (for remote wake) -->
+    <key>aps-environment</key>
+    <string>development</string>
+
+    <!-- Game Controllers (for potential future gamepad input) -->
+    <key>com.apple.developer.game-center</key>
+    <false/>
+
+    <!-- Siri Integration (for voice commands) -->
+    <key>com.apple.developer.siri</key>
+    <true/>
+
+    <!-- NFC (potential future pairing via NFC tag) -->
+    <key>com.apple.developer.nfc.readersession.formats</key>
+    <array>
+        <string>NDEF</string>
+    </array>
+</dict>
+</plist>
