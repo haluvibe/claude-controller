@@ -38,9 +38,9 @@ class GestureHandlerView: UIView {
     private let scrollSensitivity: CGFloat = 2.0
 
     // Acceleration curve parameters (mimics macOS trackpad)
-    private let baseSensitivity: CGFloat = 1.0
+    private let baseSensitivity: CGFloat = 1.8
     private let accelerationThreshold: CGFloat = 3.0   // Velocity above this gets boosted
-    private let maxAcceleration: CGFloat = 4.0         // Maximum multiplier for fast swipes
+    private let maxAcceleration: CGFloat = 6.0         // Maximum multiplier for fast swipes
     private let accelerationCurve: CGFloat = 1.5       // How quickly acceleration ramps up
 
     // Velocity tracking
