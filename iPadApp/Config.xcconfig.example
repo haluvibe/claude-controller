@@ -1,0 +1,5 @@
+// Config.xcconfig - Local configuration (DO NOT COMMIT)
+// Copy this file to Config.xcconfig and add your API keys
+
+// OpenAI Whisper API Key for cloud transcription
+OPENAI_WHISPER_KEY = your_api_key_here

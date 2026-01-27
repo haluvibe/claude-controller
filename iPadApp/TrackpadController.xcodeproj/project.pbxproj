@@ -28,6 +28,7 @@
 		BBB00004 /* GestureHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GestureHandler.swift; sourceTree = "<group>"; };
 		BBB00005 /* ConnectionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectionManager.swift; sourceTree = "<group>"; };
 		BBB00006 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		BBB00013 /* Config.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Config.xcconfig; sourceTree = "<group>"; };
 		BBB00007 /* WhisperService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WhisperService.swift; sourceTree = "<group>"; };
 		BBB00008 /* AudioRecorder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioRecorder.swift; sourceTree = "<group>"; };
 		BBB00009 /* DictationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DictationManager.swift; sourceTree = "<group>"; };
@@ -52,6 +53,7 @@
 		EEE00001 = {
 			isa = PBXGroup;
 			children = (
+				BBB00013 /* Config.xcconfig */,
 				EEE00002 /* Sources */,
 				BBB00006 /* Info.plist */,
 				EEE00006 /* Products */,
@@ -225,6 +227,7 @@
 /* Begin XCBuildConfiguration section */
 		HHH00001 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = BBB00013 /* Config.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -290,6 +293,7 @@
 		};
 		HHH00002 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = BBB00013 /* Config.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -348,6 +352,7 @@
 		};
 		HHH00003 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = BBB00013 /* Config.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -376,6 +381,7 @@
 		};
 		HHH00004 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = BBB00013 /* Config.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;

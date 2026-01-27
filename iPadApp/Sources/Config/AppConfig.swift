@@ -37,18 +37,19 @@ class AppConfig: ObservableObject {
     }
 
     /// OpenAI Whisper API key for dictation
+    /// IMPORTANT: Never hardcode API keys. Use Config.xcconfig (gitignored) instead.
     static var whisperAPIKey: String {
-        // Try to load from bundle (for release builds)
-        if let path = Bundle.main.path(forResource: "Config", ofType: "plist"),
-           let config = NSDictionary(contentsOfFile: path),
-           let key = config["OPENAI_WHISPER_KEY"] as? String,
-           !key.isEmpty {
+        // Load from Info.plist (injected from Config.xcconfig at build time)
+        if let key = Bundle.main.object(forInfoDictionaryKey: "OPENAI_WHISPER_KEY") as? String,
+           !key.isEmpty,
+           key != "$(OPENAI_WHISPER_KEY)" {  // Check it was actually substituted
             return key
         }
 
-        // Hardcoded key (from .env.local during development)
-        // In production, use Config.plist or secure storage
-        return "REDACTED_API_KEY"
+        // No key found - API mode won't work, but local mode will
+        // To use API mode, create Config.xcconfig from Config.xcconfig.example
+        print("[AppConfig] Warning: No API key found. Copy Config.xcconfig.example to Config.xcconfig and add your key.")
+        return ""
     }
 
     private init() {

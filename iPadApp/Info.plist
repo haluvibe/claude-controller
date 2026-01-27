@@ -65,5 +65,9 @@
     <!-- Minimum iOS Version -->
     <key>MinimumOSVersion</key>
     <string>18.0</string>
+
+    <!-- API Keys (from xcconfig) -->
+    <key>OPENAI_WHISPER_KEY</key>
+    <string>$(OPENAI_WHISPER_KEY)</string>
 </dict>
 </plist>
