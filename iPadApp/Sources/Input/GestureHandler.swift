@@ -28,6 +28,7 @@ class GestureHandlerView: UIView {
     private var previousTwoFingerCenter: CGPoint?
     private var threeFingerStartCenter: CGPoint?
     private var threeFingerStartTime: Date?
+    private var maxTouchCountDuringGesture: Int = 0  // Track max fingers during gesture
 
     // MARK: - Configuration
 
@@ -68,6 +69,9 @@ class GestureHandlerView: UIView {
 
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         activeTouches.append(contentsOf: touches)
+
+        // Track maximum touch count during this gesture
+        maxTouchCountDuringGesture = max(maxTouchCountDuringGesture, activeTouches.count)
 
         if activeTouches.count == 1 {
             // Single finger touch start
@@ -174,8 +178,8 @@ class GestureHandlerView: UIView {
         if let startTime = touchStartTime {
             let duration = Date().timeIntervalSince(startTime)
 
-            if touchCountBefore == 1 {
-                // Check for single finger tap
+            if touchCountBefore == 1 && maxTouchCountDuringGesture == 1 {
+                // Check for single finger tap - only if we NEVER had more than 1 finger
                 if duration < tapMaxDuration {
                     if let startPos = touchStartPosition,
                        let touch = touches.first {
@@ -188,7 +192,7 @@ class GestureHandlerView: UIView {
                         }
                     }
                 }
-            } else if touchCountBefore == 2 {
+            } else if touchCountBefore == 2 && maxTouchCountDuringGesture == 2 {
                 // Check for two finger tap (right click)
                 if duration < twoFingerTapMaxDuration {
                     let allTouchesEnded = activeTouches.isEmpty
@@ -291,5 +295,6 @@ class GestureHandlerView: UIView {
         activeTouches.removeAll()
         lastMoveTime = nil
         velocityHistory.removeAll()
+        maxTouchCountDuringGesture = 0
     }
 }

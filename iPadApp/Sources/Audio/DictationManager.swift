@@ -166,6 +166,14 @@ class DictationManager: ObservableObject {
             // Send to Mac for typing
             connectionManager.sendTextToType(text)
 
+            // Auto-enter: send Return key if enabled
+            if appConfig.autoEnter {
+                // Small delay to ensure text is typed first
+                try await Task.sleep(nanoseconds: 100_000_000) // 100ms
+                connectionManager.sendKeyPress(keyCode: 36) // Return key
+                print("[DictationManager] Auto-enter: sent Return key")
+            }
+
         } catch {
             lastError = error.localizedDescription
             print("[DictationManager] Transcription failed: \(error)")
@@ -176,5 +184,10 @@ class DictationManager: ObservableObject {
     func cancelRecording() {
         audioRecorder.cancelRecording()
         lastError = nil
+    }
+
+    /// Send Return key to Mac
+    func sendReturn() {
+        connectionManager.sendKeyPress(keyCode: 36) // Return key
     }
 }

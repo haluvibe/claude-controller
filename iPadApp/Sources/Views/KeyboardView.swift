@@ -208,11 +208,14 @@ struct KeyButton: View {
     }
 
     private var baseKeyWidth: CGFloat {
-        // Calculate based on container width (not screen width)
-        let totalKeys: CGFloat = 10.5
-        let spacing: CGFloat = 4 * 10
-        let padding: CGFloat = 16
-        return (containerWidth - spacing - padding) / totalKeys
+        // Calculate based on container width
+        // Row 1 has 10 regular keys + 1 delete (1.5 width) = 11.5 units total
+        // Gaps: 10 keys means 10 gaps at 4px each = 40px
+        // Horizontal padding: 8px each side = 16px total
+        let totalKeyUnits: CGFloat = 11.5
+        let gaps: CGFloat = 10 * 4  // 10 gaps at 4px
+        let horizontalPadding: CGFloat = 8 * 2  // padding on both sides
+        return (containerWidth - gaps - horizontalPadding) / totalKeyUnits
     }
 }
 

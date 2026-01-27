@@ -68,7 +68,7 @@ struct StatusBar: View {
 
             // Version and connected Mac name
             HStack(spacing: 8) {
-                Text("v1.2")
+                Text("v1.3")
                     .font(.system(size: 10, weight: .medium, design: .monospaced))
                     .foregroundColor(.orange)
 
@@ -142,6 +142,17 @@ struct ToolbarView: View {
         ))
     }
 
+    // Start background model download when view appears
+    private func startBackgroundModelDownload() {
+        Task {
+            // Only download if not already ready/loading
+            if !dictationManager.isLocalModelReady && !dictationManager.isLocalModelLoading {
+                print("[ToolbarView] Starting background model download...")
+                await dictationManager.loadLocalModel()
+            }
+        }
+    }
+
     var body: some View {
         VStack(spacing: 4) {
             // Dictation status (shows when active)
@@ -183,6 +194,9 @@ struct ToolbarView: View {
                 // Dictation button (microphone)
                 DictationButton(dictationManager: dictationManager)
 
+                // Auto-enter / Return button
+                AutoEnterButton(dictationManager: dictationManager)
+
                 // Keyboard toggle button
                 Button(action: {
                     showKeyboard.toggle()
@@ -197,6 +211,10 @@ struct ToolbarView: View {
             }
         }
         .padding(.horizontal, 16)
+        .onAppear {
+            // Start downloading local model in background (doesn't block cloud API)
+            startBackgroundModelDownload()
+        }
     }
 }
 

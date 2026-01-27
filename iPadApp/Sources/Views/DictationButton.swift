@@ -39,7 +39,7 @@ struct DictationButton: View {
                 }
             }
         }
-        .disabled(dictationManager.isTranscribing || dictationManager.isLocalModelLoading)
+        .disabled(dictationManager.isTranscribing || (dictationManager.isLocalModelLoading && AppConfig.shared.transcriptionMode == .local))
         .alert("Microphone Access Required", isPresented: $showingPermissionAlert) {
             Button("Open Settings") {
                 if let url = URL(string: UIApplication.openSettingsURLString) {
@@ -60,7 +60,8 @@ struct DictationButton: View {
             return .red
         } else if dictationManager.isTranscribing {
             return .orange
-        } else if dictationManager.isLocalModelLoading {
+        } else if dictationManager.isLocalModelLoading && AppConfig.shared.transcriptionMode == .local {
+            // Only show purple loading state if in local mode
             return .purple
         } else {
             return .blue
@@ -106,6 +107,43 @@ struct DictationButton: View {
 
     private func checkPermission() async -> Bool {
         AVAudioApplication.shared.recordPermission == .granted
+    }
+}
+
+// MARK: - Auto-Enter / Return Button
+
+struct AutoEnterButton: View {
+    @ObservedObject var appConfig = AppConfig.shared
+    @ObservedObject var dictationManager: DictationManager
+
+    var body: some View {
+        Button(action: handleTap) {
+            Image(systemName: "return")
+                .font(.system(size: 20, weight: .semibold))
+                .foregroundColor(.white)
+                .frame(width: 50, height: 50)
+                .background(appConfig.autoEnter ? Color.green : Color(white: 0.25))
+                .cornerRadius(10)
+                .overlay(
+                    // Auto indicator dot
+                    Circle()
+                        .fill(appConfig.autoEnter ? Color.white : Color.clear)
+                        .frame(width: 8, height: 8)
+                        .offset(x: 16, y: -16)
+                )
+        }
+    }
+
+    private func handleTap() {
+        if dictationManager.isRecording || dictationManager.isTranscribing {
+            // During recording/transcribing, just send return
+            dictationManager.sendReturn()
+        } else {
+            // Otherwise, toggle auto-enter mode
+            withAnimation(.easeInOut(duration: 0.2)) {
+                appConfig.autoEnter.toggle()
+            }
+        }
     }
 }
 

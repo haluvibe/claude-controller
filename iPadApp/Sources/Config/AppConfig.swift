@@ -36,6 +36,13 @@ class AppConfig: ObservableObject {
         }
     }
 
+    /// Auto-enter mode - automatically send Return after dictation
+    @Published var autoEnter: Bool {
+        didSet {
+            UserDefaults.standard.set(autoEnter, forKey: "autoEnter")
+        }
+    }
+
     /// OpenAI Whisper API key for dictation
     /// IMPORTANT: Never hardcode API keys. Use Config.xcconfig (gitignored) instead.
     static var whisperAPIKey: String {
@@ -56,5 +63,8 @@ class AppConfig: ObservableObject {
         // Load saved preference or default to API
         let savedMode = UserDefaults.standard.string(forKey: "transcriptionMode") ?? TranscriptionMode.api.rawValue
         self.transcriptionMode = TranscriptionMode(rawValue: savedMode) ?? .api
+
+        // Load auto-enter preference (default to true for convenience)
+        self.autoEnter = UserDefaults.standard.object(forKey: "autoEnter") as? Bool ?? true
     }
 }
