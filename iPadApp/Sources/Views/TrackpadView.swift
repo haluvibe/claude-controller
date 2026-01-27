@@ -237,6 +237,9 @@ struct ToolbarView: View {
                 // Dictation button (microphone)
                 DictationButton(dictationManager: dictationManager)
 
+                // Cancel recording button (only visible when recording)
+                CancelRecordingButton(dictationManager: dictationManager)
+
                 // Auto-enter / Return button
                 AutoEnterButton(dictationManager: dictationManager)
 

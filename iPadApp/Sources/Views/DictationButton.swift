@@ -110,6 +110,28 @@ struct DictationButton: View {
     }
 }
 
+// MARK: - Cancel Recording Button
+
+struct CancelRecordingButton: View {
+    @ObservedObject var dictationManager: DictationManager
+
+    var body: some View {
+        if dictationManager.isRecording {
+            Button(action: {
+                dictationManager.cancelRecording()
+            }) {
+                Image(systemName: "xmark")
+                    .font(.system(size: 20, weight: .semibold))
+                    .foregroundColor(.white)
+                    .frame(width: 50, height: 50)
+                    .background(Color.red.opacity(0.8))
+                    .cornerRadius(10)
+            }
+            .transition(.scale.combined(with: .opacity))
+        }
+    }
+}
+
 // MARK: - Auto-Enter / Return Button
 
 struct AutoEnterButton: View {
