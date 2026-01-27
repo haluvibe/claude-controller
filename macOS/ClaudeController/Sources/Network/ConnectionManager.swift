@@ -30,7 +30,10 @@ struct ControlMessage: Codable, Sendable {
         case text
         case threeFingerSwipe
         case textToType  // For dictation - types text into focused app
+        case macroSelect // For macro keyboard - types selected option number + Enter
     }
+
+    var optionNumber: Int?
 
     var swipeDirection: String?
 }
@@ -327,6 +330,17 @@ final class ConnectionManager: ObservableObject {
                 print("🎤 Typing dictated text: \(text.prefix(50))...")
                 injector.typeText(text)
             }
+
+        case .macroSelect:
+            // Macro keyboard: type the selected option number + Enter
+            if let number = message.optionNumber {
+                print("🔘 Macro selection: typing \(number) + Enter")
+                injector.typeText("\(number)")
+                // Small delay then press Enter
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
+                    injector.keyPress(keyCode: 36, modifiers: 0) // Return key
+                }
+            }
         }
     }
 
@@ -358,6 +372,39 @@ final class ConnectionManager: ObservableObject {
         } catch {
             print("❌ JSON serialization error: \(error)")
         }
+    }
+
+    // MARK: - Macro Options
+
+    /// Send macro options to iPad
+    func sendMacroOptions(_ options: [[String: Any]], needsAttention: Bool) {
+        let message: [String: Any] = [
+            "type": "macroOptions",
+            "options": options,
+            "needsAttention": needsAttention,
+            "timestamp": Date().timeIntervalSince1970
+        ]
+        sendJSON(message)
+        print("📋 Sent \(options.count) macro options to iPad")
+    }
+
+    /// Clear macro options on iPad
+    func sendMacroClear() {
+        let message: [String: Any] = [
+            "type": "macroClear"
+        ]
+        sendJSON(message)
+        print("📋 Cleared macro options")
+    }
+
+    /// Send test macro options (for testing)
+    func sendTestMacroOptions() {
+        let options: [[String: Any]] = [
+            ["number": 1, "text": "Yes, proceed with changes"],
+            ["number": 2, "text": "No, cancel"],
+            ["number": 3, "text": "Skip this step"]
+        ]
+        sendMacroOptions(options, needsAttention: true)
     }
 }
 

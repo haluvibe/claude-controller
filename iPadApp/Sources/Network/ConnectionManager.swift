@@ -25,6 +25,9 @@ class ConnectionManager: ObservableObject {
     @Published private(set) var isConnected: Bool = false
     @Published private(set) var connectedMacName: String?
 
+    // MARK: - Macro Manager (set by TrackpadView)
+    weak var macroManager: MacroManager?
+
     // MARK: - Private Properties
 
     private var browser: NWBrowser?
@@ -227,17 +230,32 @@ class ConnectionManager: ObservableObject {
     }
 
     private func handleReceivedData(_ data: Data) {
-        // Handle server responses (ack, config, etc.)
-        // For MVP, we mainly care about sending data, not receiving
+        // Handle server responses (ack, config, macro options, etc.)
         if let response = try? JSONDecoder().decode(ServerResponse.self, from: data) {
             switch response.type {
             case "handshake_ack":
                 print("[ConnectionManager] Handshake acknowledged")
             case "pong":
                 print("[ConnectionManager] Pong received")
+            case "macroOptions":
+                // Try to decode as MacroOptionsMessage
+                handleMacroOptionsData(data)
+            case "macroClear":
+                print("[ConnectionManager] Macro clear received")
+                macroManager?.clearOptions()
             default:
                 break
             }
+        }
+    }
+
+    private func handleMacroOptionsData(_ data: Data) {
+        do {
+            let message = try JSONDecoder().decode(MacroOptionsMessage.self, from: data)
+            print("[ConnectionManager] Received \(message.options.count) macro options, attention: \(message.needsAttention)")
+            macroManager?.updateOptions(message.options, needsAttention: message.needsAttention)
+        } catch {
+            print("[ConnectionManager] Failed to decode macro options: \(error)")
         }
     }
 
@@ -366,6 +384,16 @@ class ConnectionManager: ObservableObject {
         queueMessage(message)
         print("[ConnectionManager] Sent text to type: \(text.prefix(50))...")
     }
+
+    // MARK: - Public API - Macro Selection
+
+    /// Send macro selection to Mac (types the number + Enter)
+    func sendMacroSelect(optionNumber: Int) {
+        var message = ControlMessage(type: .macroSelect)
+        message.optionNumber = optionNumber
+        queueMessage(message)
+        print("[ConnectionManager] Sent macro selection: \(optionNumber)")
+    }
 }
 
 // MARK: - Message Types
@@ -377,6 +405,7 @@ struct ControlMessage: Codable {
     var keyCode: UInt16?
     var modifiers: UInt32?
     var text: String?
+    var optionNumber: Int?
 
     enum MessageType: String, Codable {
         case mouseMove
@@ -390,6 +419,7 @@ struct ControlMessage: Codable {
         case text
         case threeFingerSwipe
         case textToType  // For dictation - types text into focused Mac app
+        case macroSelect // For macro keyboard - types selected option number + Enter
     }
 
     var swipeDirection: String?
@@ -403,4 +433,37 @@ struct MessageBatch: Codable {
 struct ServerResponse: Codable {
     let type: String
     var message: String?
+}
+
+/// Message from macOS with parsed macro options
+struct MacroOptionsMessage: Codable {
+    let type: String
+    let options: [MacroOption]
+    let needsAttention: Bool
+    let timestamp: Double
+}
+
+/// Represents a parsed option from Claude's terminal output
+struct MacroOption: Identifiable, Codable, Equatable {
+    let id: UUID
+    let number: Int
+    let text: String
+
+    init(number: Int, text: String) {
+        self.id = UUID()
+        self.number = number
+        self.text = text
+    }
+
+    enum CodingKeys: String, CodingKey {
+        case id, number, text
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        // ID might not be in the JSON, generate one
+        self.id = (try? container.decode(UUID.self, forKey: .id)) ?? UUID()
+        self.number = try container.decode(Int.self, forKey: .number)
+        self.text = try container.decode(String.self, forKey: .text)
+    }
 }

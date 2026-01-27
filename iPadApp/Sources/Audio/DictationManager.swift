@@ -168,10 +168,12 @@ class DictationManager: ObservableObject {
 
             // Auto-enter: send Return key if enabled
             if appConfig.autoEnter {
-                // Small delay to ensure text is typed first
-                try await Task.sleep(nanoseconds: 100_000_000) // 100ms
+                // Longer delay to ensure text is fully typed first
+                // Text typing can be slow depending on text length
+                let delayMs = max(300, text.count * 10) // At least 300ms, plus 10ms per character
+                try await Task.sleep(nanoseconds: UInt64(delayMs) * 1_000_000)
                 connectionManager.sendKeyPress(keyCode: 36) // Return key
-                print("[DictationManager] Auto-enter: sent Return key")
+                print("[DictationManager] Auto-enter: sent Return key after \(delayMs)ms delay")
             }
 
         } catch {

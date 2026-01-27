@@ -145,6 +145,21 @@ struct StatusView: View {
 
             Divider()
 
+            // Test macro button (when connected)
+            if connectionManager.isConnected {
+                Button(action: {
+                    connectionManager.sendTestMacroOptions()
+                }) {
+                    HStack {
+                        Image(systemName: "list.number")
+                        Text("Test Macro Bar")
+                    }
+                }
+                .buttonStyle(.plain)
+                .foregroundColor(.blue)
+                .padding(.bottom, 4)
+            }
+
             // Quit button
             Button(action: {
                 NSApplication.shared.terminate(nil)
@@ -158,6 +173,6 @@ struct StatusView: View {
             .foregroundColor(.red)
             .padding(.bottom, 8)
         }
-        .frame(width: 280, height: 200)
+        .frame(width: 280, height: 220)
     }
 }

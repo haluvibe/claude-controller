@@ -7,6 +7,12 @@ import SwiftUI
 struct TrackpadView: View {
     @EnvironmentObject var connectionManager: ConnectionManager
     @State private var showKeyboard = false
+    @StateObject private var macroManager: MacroManager
+
+    init() {
+        // MacroManager will be properly initialized when connectionManager is available
+        _macroManager = StateObject(wrappedValue: MacroManager())
+    }
 
     var body: some View {
         GeometryReader { geometry in
@@ -16,14 +22,21 @@ struct TrackpadView: View {
                     .ignoresSafeArea()
 
                 VStack(spacing: 0) {
-                    // Status bar at top
-                    StatusBar(connectionManager: connectionManager)
+                    // Status bar at top (with attention indicator)
+                    StatusBar(connectionManager: connectionManager, macroManager: macroManager)
                         .frame(height: 44)
                         .background(Color(white: 0.1))
+                        .attentionIndicator(macroManager.needsAttention)
 
                     // Main trackpad area
                     TrackpadTouchArea(connectionManager: connectionManager)
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
+
+                    // Macro bar (slides in when options available)
+                    if macroManager.isBarVisible {
+                        MacroBarView(macroManager: macroManager, connectionManager: connectionManager)
+                            .transition(.move(edge: .bottom).combined(with: .opacity))
+                    }
 
                     // Keyboard (shown/hidden)
                     if showKeyboard {
@@ -42,6 +55,12 @@ struct TrackpadView: View {
             }
         }
         .animation(.easeInOut(duration: 0.25), value: showKeyboard)
+        .animation(.easeInOut(duration: 0.25), value: macroManager.isBarVisible)
+        .onAppear {
+            // Set up macro manager with connection manager
+            macroManager.connectionManager = connectionManager
+            connectionManager.macroManager = macroManager
+        }
     }
 }
 
@@ -49,6 +68,12 @@ struct TrackpadView: View {
 
 struct StatusBar: View {
     @ObservedObject var connectionManager: ConnectionManager
+    @ObservedObject var macroManager: MacroManager
+
+    /// Get version from Bundle
+    private var appVersion: String {
+        Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "?.?"
+    }
 
     var body: some View {
         HStack {
@@ -61,6 +86,13 @@ struct StatusBar: View {
                 Text(statusText)
                     .font(.system(size: 14, weight: .medium))
                     .foregroundColor(.white)
+
+                // Macro notification badge
+                if !macroManager.options.isEmpty && !macroManager.isBarVisible {
+                    Circle()
+                        .fill(Color.orange)
+                        .frame(width: 8, height: 8)
+                }
             }
             .padding(.leading, 16)
 
@@ -68,7 +100,7 @@ struct StatusBar: View {
 
             // Version and connected Mac name
             HStack(spacing: 8) {
-                Text("v1.3")
+                Text("v\(appVersion)")
                     .font(.system(size: 10, weight: .medium, design: .monospaced))
                     .foregroundColor(.orange)
 

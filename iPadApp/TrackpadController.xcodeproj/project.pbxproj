@@ -19,6 +19,9 @@
 		AAA00010 /* DictationButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBB00011 /* DictationButton.swift */; };
 		AAA00011 /* LocalWhisperService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBB00012 /* LocalWhisperService.swift */; };
 		AAA00012 /* WhisperKit in Frameworks */ = {isa = PBXBuildFile; productRef = PPP00001 /* WhisperKit */; };
+		AAA00013 /* MacroManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBB00014 /* MacroManager.swift */; };
+		AAA00014 /* MacroBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBB00015 /* MacroBarView.swift */; };
+		AAA00015 /* AttentionIndicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBB00016 /* AttentionIndicator.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -35,6 +38,9 @@
 		BBB00010 /* AppConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppConfig.swift; sourceTree = "<group>"; };
 		BBB00011 /* DictationButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DictationButton.swift; sourceTree = "<group>"; };
 		BBB00012 /* LocalWhisperService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalWhisperService.swift; sourceTree = "<group>"; };
+		BBB00014 /* MacroManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacroManager.swift; sourceTree = "<group>"; };
+		BBB00015 /* MacroBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacroBarView.swift; sourceTree = "<group>"; };
+		BBB00016 /* AttentionIndicator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AttentionIndicator.swift; sourceTree = "<group>"; };
 		CCC00001 /* TrackpadController.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TrackpadController.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -67,6 +73,7 @@
 				EEE00008 /* Audio */,
 				EEE00009 /* Config */,
 				EEE00005 /* Input */,
+				EEE00010 /* Managers */,
 				EEE00007 /* Network */,
 				EEE00004 /* Views */,
 			);
@@ -84,8 +91,10 @@
 		EEE00004 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				BBB00016 /* AttentionIndicator.swift */,
 				BBB00011 /* DictationButton.swift */,
 				BBB00003 /* KeyboardView.swift */,
+				BBB00015 /* MacroBarView.swift */,
 				BBB00002 /* TrackpadView.swift */,
 			);
 			path = Views;
@@ -132,6 +141,14 @@
 				BBB00010 /* AppConfig.swift */,
 			);
 			path = Config;
+			sourceTree = "<group>";
+		};
+		EEE00010 /* Managers */ = {
+			isa = PBXGroup;
+			children = (
+				BBB00014 /* MacroManager.swift */,
+			);
+			path = Managers;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -219,6 +236,9 @@
 				AAA00009 /* AppConfig.swift in Sources */,
 				AAA00010 /* DictationButton.swift in Sources */,
 				AAA00011 /* LocalWhisperService.swift in Sources */,
+				AAA00013 /* MacroManager.swift in Sources */,
+				AAA00014 /* MacroBarView.swift in Sources */,
+				AAA00015 /* AttentionIndicator.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -368,7 +388,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.48;
 				PRODUCT_BUNDLE_IDENTIFIER = com.personal.TrackpadController;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -397,7 +417,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.48;
 				PRODUCT_BUNDLE_IDENTIFIER = com.personal.TrackpadController;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
