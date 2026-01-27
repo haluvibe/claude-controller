@@ -10,12 +10,14 @@
 		A1000001AAAAAAAA00000001 /* ClaudeControllerApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000001AAAAAAAA00000001 /* ClaudeControllerApp.swift */; };
 		A1000002AAAAAAAA00000002 /* InputInjector.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000002AAAAAAAA00000002 /* InputInjector.swift */; };
 		A1000003AAAAAAAA00000003 /* ConnectionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000003AAAAAAAA00000003 /* ConnectionManager.swift */; };
+		A1000004AAAAAAAA00000004 /* MCPBridgeServer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000006AAAAAAAA00000006 /* MCPBridgeServer.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		A2000001AAAAAAAA00000001 /* ClaudeControllerApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClaudeControllerApp.swift; sourceTree = "<group>"; };
 		A2000002AAAAAAAA00000002 /* InputInjector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputInjector.swift; sourceTree = "<group>"; };
 		A2000003AAAAAAAA00000003 /* ConnectionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectionManager.swift; sourceTree = "<group>"; };
+		A2000006AAAAAAAA00000006 /* MCPBridgeServer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MCPBridgeServer.swift; sourceTree = "<group>"; };
 		A2000004AAAAAAAA00000004 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		A2000005AAAAAAAA00000005 /* ClaudeController.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ClaudeController.entitlements; sourceTree = "<group>"; };
 		A3000001AAAAAAAA00000001 /* ClaudeController.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ClaudeController.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -88,6 +90,7 @@
 			isa = PBXGroup;
 			children = (
 				A2000003AAAAAAAA00000003 /* ConnectionManager.swift */,
+				A2000006AAAAAAAA00000006 /* MCPBridgeServer.swift */,
 			);
 			path = Network;
 			sourceTree = "<group>";
@@ -152,6 +155,7 @@
 				A1000001AAAAAAAA00000001 /* ClaudeControllerApp.swift in Sources */,
 				A1000002AAAAAAAA00000002 /* InputInjector.swift in Sources */,
 				A1000003AAAAAAAA00000003 /* ConnectionManager.swift in Sources */,
+				A1000004AAAAAAAA00000004 /* MCPBridgeServer.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

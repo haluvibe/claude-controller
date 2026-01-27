@@ -206,6 +206,8 @@ class ConnectionManager: ObservableObject {
 
     // MARK: - Receiving
 
+    private var receiveBuffer = Data()
+
     private func startReceiving() {
         receiveNextMessage()
     }
@@ -214,7 +216,8 @@ class ConnectionManager: ObservableObject {
         connection?.receive(minimumIncompleteLength: 1, maximumLength: 65536) { [weak self] content, _, isComplete, error in
             Task { @MainActor in
                 if let data = content {
-                    self?.handleReceivedData(data)
+                    self?.receiveBuffer.append(data)
+                    self?.processReceiveBuffer()
                 }
 
                 if let error = error {
@@ -229,7 +232,43 @@ class ConnectionManager: ObservableObject {
         }
     }
 
+    private func processReceiveBuffer() {
+        // Protocol: 4-byte length prefix (big endian) + JSON data
+        while receiveBuffer.count >= 4 {
+            let byte0 = receiveBuffer[receiveBuffer.startIndex]
+            let byte1 = receiveBuffer[receiveBuffer.index(receiveBuffer.startIndex, offsetBy: 1)]
+            let byte2 = receiveBuffer[receiveBuffer.index(receiveBuffer.startIndex, offsetBy: 2)]
+            let byte3 = receiveBuffer[receiveBuffer.index(receiveBuffer.startIndex, offsetBy: 3)]
+
+            let length = Int(byte0) << 24 | Int(byte1) << 16 | Int(byte2) << 8 | Int(byte3)
+
+            guard length > 0 && length < 65536 else {
+                print("[ConnectionManager] Invalid message length: \(length), clearing buffer")
+                receiveBuffer.removeAll()
+                return
+            }
+
+            let totalLength = 4 + length
+            guard receiveBuffer.count >= totalLength else {
+                // Wait for more data
+                break
+            }
+
+            // Extract JSON message (skip 4-byte prefix)
+            let messageData = Data(receiveBuffer.dropFirst(4).prefix(length))
+            receiveBuffer.removeFirst(totalLength)
+
+            // Process the message
+            handleReceivedData(messageData)
+        }
+    }
+
     private func handleReceivedData(_ data: Data) {
+        // Debug: print raw message
+        if let str = String(data: data, encoding: .utf8) {
+            print("[ConnectionManager] Received: \(str.prefix(200))")
+        }
+
         // Handle server responses (ack, config, macro options, etc.)
         if let response = try? JSONDecoder().decode(ServerResponse.self, from: data) {
             switch response.type {
@@ -243,8 +282,10 @@ class ConnectionManager: ObservableObject {
             case "macroClear":
                 print("[ConnectionManager] Macro clear received")
                 macroManager?.clearOptions()
+            case "notification":
+                handleNotificationData(data)
             default:
-                break
+                print("[ConnectionManager] Unknown message type: \(response.type)")
             }
         }
     }
@@ -256,6 +297,20 @@ class ConnectionManager: ObservableObject {
             macroManager?.updateOptions(message.options, needsAttention: message.needsAttention)
         } catch {
             print("[ConnectionManager] Failed to decode macro options: \(error)")
+        }
+    }
+
+    private func handleNotificationData(_ data: Data) {
+        do {
+            let notification = try JSONDecoder().decode(NotificationMessage.self, from: data)
+            print("[ConnectionManager] Notification: \(notification.message)")
+            macroManager?.showNotification(
+                message: notification.message,
+                playSound: notification.playSound,
+                haptic: notification.haptic
+            )
+        } catch {
+            print("[ConnectionManager] Failed to decode notification: \(error)")
         }
     }
 
@@ -441,6 +496,13 @@ struct MacroOptionsMessage: Codable {
     let options: [MacroOption]
     let needsAttention: Bool
     let timestamp: Double
+}
+
+struct NotificationMessage: Codable {
+    let type: String
+    let message: String
+    let playSound: Bool
+    let haptic: Bool
 }
 
 /// Represents a parsed option from Claude's terminal output

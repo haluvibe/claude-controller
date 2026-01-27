@@ -98,6 +98,21 @@ struct StatusBar: View {
 
             Spacer()
 
+            // Notification counter (for debugging MCP)
+            if macroManager.notificationCount > 0 {
+                HStack(spacing: 4) {
+                    Image(systemName: "bell.fill")
+                        .font(.system(size: 10))
+                    Text("\(macroManager.notificationCount)")
+                        .font(.system(size: 12, weight: .bold, design: .monospaced))
+                }
+                .foregroundColor(.yellow)
+                .padding(.horizontal, 8)
+                .padding(.vertical, 4)
+                .background(Color.yellow.opacity(0.2))
+                .cornerRadius(8)
+            }
+
             // Version and connected Mac name
             HStack(spacing: 8) {
                 Text("v\(appVersion)")

@@ -5,6 +5,7 @@
 import Foundation
 import AVFoundation
 import UIKit
+import AudioToolbox
 
 // Note: MacroOption and MacroOptionsMessage are defined in ConnectionManager.swift
 
@@ -16,6 +17,7 @@ class MacroManager: ObservableObject {
     @Published var options: [MacroOption] = []
     @Published var needsAttention: Bool = false
     @Published var isBarVisible: Bool = false
+    @Published var notificationCount: Int = 0
 
     // MARK: - Connection Manager (set after init)
     weak var connectionManager: ConnectionManager?
@@ -104,9 +106,10 @@ class MacroManager: ObservableObject {
             // Create player
             audioPlayer = try AVAudioPlayer(contentsOf: tempURL)
             audioPlayer?.prepareToPlay()
-            audioPlayer?.volume = 0.5
+            audioPlayer?.volume = 1.0  // Full volume
+            print("[MacroManager] ✅ Chime sound created successfully, duration: \(audioPlayer?.duration ?? 0)s")
         } catch {
-            print("[MacroManager] Failed to create chime sound: \(error)")
+            print("[MacroManager] ❌ Failed to create chime sound: \(error)")
         }
     }
 
@@ -154,6 +157,25 @@ class MacroManager: ObservableObject {
         return option.number
     }
 
+    /// Show a notification from Claude (MCP server)
+    func showNotification(message: String, playSound: Bool, haptic: Bool) {
+        notificationCount += 1
+        print("[MacroManager] 🔔 Notification #\(notificationCount): \(message) (sound=\(playSound), haptic=\(haptic))")
+
+        if haptic {
+            print("[MacroManager] Triggering haptic feedback...")
+            feedbackGenerator?.notificationOccurred(.warning)
+            feedbackGenerator?.prepare()
+        }
+
+        if playSound {
+            print("[MacroManager] Playing chime sound...")
+            playChime()
+        }
+
+        print("[MacroManager] Notification processing complete")
+    }
+
     // MARK: - Alert Methods
 
     private func playAttentionAlerts() {
@@ -166,15 +188,10 @@ class MacroManager: ObservableObject {
     }
 
     private func playChime() {
-        // Configure audio session for playback alongside other audio
-        do {
-            try AVAudioSession.sharedInstance().setCategory(.ambient, mode: .default)
-            try AVAudioSession.sharedInstance().setActive(true)
-        } catch {
-            print("[MacroManager] Audio session error: \(error)")
-        }
-
-        audioPlayer?.currentTime = 0
-        audioPlayer?.play()
+        // Use system alert sound - plays even on silent mode
+        // 1005 = alarm/alert sound (loud)
+        // 4095 = vibrate (if available)
+        AudioServicesPlayAlertSound(1005)
+        print("[MacroManager] Played alert sound 1005")
     }
 }

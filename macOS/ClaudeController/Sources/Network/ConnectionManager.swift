@@ -406,6 +406,20 @@ final class ConnectionManager: ObservableObject {
         ]
         sendMacroOptions(options, needsAttention: true)
     }
+
+    // MARK: - MCP Bridge Methods
+
+    /// Send notification to iPad
+    func sendNotification(message: String, playSound: Bool, haptic: Bool) {
+        let msg: [String: Any] = [
+            "type": "notification",
+            "message": message,
+            "playSound": playSound,
+            "haptic": haptic
+        ]
+        sendJSON(msg)
+        print("🔔 Sent notification to iPad: \(message)")
+    }
 }
 
 // MARK: - Handshake Message

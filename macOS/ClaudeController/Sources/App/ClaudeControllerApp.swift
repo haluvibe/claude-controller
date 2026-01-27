@@ -17,6 +17,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     private var statusItem: NSStatusItem?
     private var popover: NSPopover?
     private var connectionManager: ConnectionManager?
+    private var mcpBridgeServer: MCPBridgeServer?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         // Hide dock icon (menu bar app only)
@@ -43,8 +44,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         let contentView = StatusView(connectionManager: connectionManager!)
         popover?.contentViewController = NSHostingController(rootView: contentView)
 
-        // Start listening
+        // Start listening for iPad connections
         connectionManager?.startListening()
+
+        // Start MCP bridge server (receives commands from Claude Code MCP server)
+        setupMCPBridge()
 
         // Update icon based on connection state
         connectionManager?.onConnectionStateChanged = { [weak self] isConnected in
@@ -52,6 +56,34 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                 self?.updateStatusIcon(connected: isConnected)
             }
         }
+    }
+
+    private func setupMCPBridge() {
+        mcpBridgeServer = MCPBridgeServer()
+
+        // Macro options
+        mcpBridgeServer?.onMacroOptions = { [weak self] options, needsAttention in
+            self?.connectionManager?.sendMacroOptions(options, needsAttention: needsAttention)
+        }
+
+        mcpBridgeServer?.onMacroClear = { [weak self] in
+            self?.connectionManager?.sendMacroClear()
+        }
+
+        // Notifications (send to iPad)
+        mcpBridgeServer?.onNotification = { [weak self] message, playSound, haptic in
+            self?.connectionManager?.sendNotification(message: message, playSound: playSound, haptic: haptic)
+        }
+
+        // Connection status
+        mcpBridgeServer?.getConnectionStatus = { [weak self] in
+            guard let cm = self?.connectionManager else {
+                return (connected: false, deviceName: nil)
+            }
+            return (connected: cm.isConnected, deviceName: cm.connectedDeviceName)
+        }
+
+        mcpBridgeServer?.start()
     }
 
     func updateStatusIcon(connected: Bool) {
@@ -74,6 +106,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func applicationWillTerminate(_ notification: Notification) {
+        mcpBridgeServer?.stop()
         connectionManager?.stopListening()
     }
 }
