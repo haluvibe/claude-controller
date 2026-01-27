@@ -32,11 +32,8 @@ struct TrackpadView: View {
                     TrackpadTouchArea(connectionManager: connectionManager)
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
 
-                    // Macro bar (slides in when options available)
-                    if macroManager.isBarVisible {
-                        MacroBarView(macroManager: macroManager, connectionManager: connectionManager)
-                            .transition(.move(edge: .bottom).combined(with: .opacity))
-                    }
+                    // Macro bar (always visible with Accept button, plus Claude options when available)
+                    MacroBarView(macroManager: macroManager, connectionManager: connectionManager)
 
                     // Keyboard (shown/hidden)
                     if showKeyboard {
@@ -55,7 +52,6 @@ struct TrackpadView: View {
             }
         }
         .animation(.easeInOut(duration: 0.25), value: showKeyboard)
-        .animation(.easeInOut(duration: 0.25), value: macroManager.isBarVisible)
         .onAppear {
             // Set up macro manager with connection manager
             macroManager.connectionManager = connectionManager
@@ -243,6 +239,18 @@ struct ToolbarView: View {
 
                 // Auto-enter / Return button
                 AutoEnterButton(dictationManager: dictationManager)
+
+                // Cycle options button (Shift+Tab)
+                Button(action: {
+                    connectionManager.sendKeyPress(keyCode: 48, modifiers: 0x20000)
+                }) {
+                    Image(systemName: "arrow.trianglehead.2.clockwise.rotate.90")
+                        .font(.system(size: 24))
+                        .foregroundColor(.white)
+                        .frame(width: 50, height: 44)
+                        .background(Color.blue.opacity(0.8))
+                        .cornerRadius(8)
+                }
 
                 // Keyboard toggle button
                 Button(action: {

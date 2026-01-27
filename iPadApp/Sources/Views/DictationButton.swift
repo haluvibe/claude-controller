@@ -135,14 +135,9 @@ struct AutoEnterButton: View {
     }
 
     private func handleTap() {
-        if dictationManager.isRecording || dictationManager.isTranscribing {
-            // During recording/transcribing, just send return
-            dictationManager.sendReturn()
-        } else {
-            // Otherwise, toggle auto-enter mode
-            withAnimation(.easeInOut(duration: 0.2)) {
-                appConfig.autoEnter.toggle()
-            }
+        // Always toggle auto-enter mode, even during recording
+        withAnimation(.easeInOut(duration: 0.2)) {
+            appConfig.autoEnter.toggle()
         }
     }
 }

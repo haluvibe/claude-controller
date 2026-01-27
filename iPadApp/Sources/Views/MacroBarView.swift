@@ -4,32 +4,71 @@
 
 import SwiftUI
 
-/// Displays macro option buttons that slide in when Claude presents numbered options
+/// Displays macro option buttons - always shows Accept button, plus any Claude options
 struct MacroBarView: View {
     @ObservedObject var macroManager: MacroManager
     let connectionManager: ConnectionManager
 
     var body: some View {
-        if macroManager.isBarVisible && !macroManager.options.isEmpty {
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 8) {
-                    ForEach(macroManager.options) { option in
-                        MacroButton(option: option) {
-                            let number = macroManager.selectOption(option)
-                            connectionManager.sendMacroSelect(optionNumber: number)
-                        }
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 8) {
+                // Accept Suggestion button (Right Arrow + Enter for CLI autocomplete)
+                // Always shown as the first option
+                AcceptSuggestionButton(connectionManager: connectionManager)
+
+                // Claude's numbered options (when available)
+                ForEach(macroManager.options) { option in
+                    MacroButton(option: option) {
+                        let number = macroManager.selectOption(option)
+                        connectionManager.sendMacroSelect(optionNumber: number)
                     }
                 }
-                .padding(.horizontal, 12)
-                .padding(.vertical, 8)
             }
-            .background(
-                RoundedRectangle(cornerRadius: 12)
-                    .fill(Color(white: 0.12))
-                    .shadow(color: .black.opacity(0.3), radius: 4, y: -2)
-            )
-            .transition(.move(edge: .bottom).combined(with: .opacity))
+            .padding(.horizontal, 12)
+            .padding(.vertical, 8)
         }
+        .background(
+            RoundedRectangle(cornerRadius: 12)
+                .fill(Color(white: 0.12))
+                .shadow(color: .black.opacity(0.3), radius: 4, y: -2)
+        )
+    }
+}
+
+/// Accept Suggestion button - sends Right Arrow + Enter for CLI autocomplete
+struct AcceptSuggestionButton: View {
+    let connectionManager: ConnectionManager
+    @State private var isPressed = false
+
+    var body: some View {
+        Button(action: {
+            // Send Right Arrow (keyCode 124) then Return (keyCode 36)
+            connectionManager.sendKeyPress(keyCode: 124, modifiers: 0)
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
+                connectionManager.sendKeyPress(keyCode: 36, modifiers: 0)
+            }
+        }) {
+            HStack(spacing: 6) {
+                Image(systemName: "checkmark.circle.fill")
+                    .font(.system(size: 14, weight: .bold))
+                    .foregroundColor(.white)
+
+                Text("Accept")
+                    .font(.system(size: 13, weight: .medium))
+                    .foregroundColor(.white)
+            }
+            .padding(.horizontal, 12)
+            .padding(.vertical, 8)
+            .background(
+                RoundedRectangle(cornerRadius: 8)
+                    .fill(isPressed ? Color.green.opacity(0.9) : Color.green.opacity(0.7))
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 8)
+                    .stroke(Color.green.opacity(0.3), lineWidth: 1)
+            )
+        }
+        .buttonStyle(MacroButtonStyle(isPressed: $isPressed))
     }
 }
 
