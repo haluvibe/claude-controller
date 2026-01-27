@@ -278,12 +278,10 @@ struct DictationStatusView: View {
 #Preview {
     VStack {
         DictationButton(dictationManager: DictationManager(
-            connectionManager: ConnectionManager(),
-            apiKey: "test-key"
+            connectionManager: ConnectionManager()
         ))
         DictationStatusView(dictationManager: DictationManager(
-            connectionManager: ConnectionManager(),
-            apiKey: "test-key"
+            connectionManager: ConnectionManager()
         ))
     }
     .padding()

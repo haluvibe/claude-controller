@@ -43,10 +43,13 @@ class AppConfig: ObservableObject {
         }
     }
 
-    /// OpenAI Whisper API key for dictation
-    /// IMPORTANT: Never hardcode API keys. Use Config.xcconfig (gitignored) instead.
+    /// OpenAI Whisper API key for dictation (DEPRECATED)
+    /// Use ProviderManager.shared instead for runtime-configurable providers
+    /// This property only checks Info.plist for backwards compatibility during migration.
+    @available(*, deprecated, message: "Use ProviderManager.shared for provider configuration")
     static var whisperAPIKey: String {
-        // Load from Info.plist (injected from Config.xcconfig at build time)
+        // Fallback: Load from Info.plist (injected from Config.xcconfig at build time)
+        // Note: Runtime providers should be accessed via ProviderManager.shared
         if let key = Bundle.main.object(forInfoDictionaryKey: "OPENAI_WHISPER_KEY") as? String,
            !key.isEmpty,
            key != "$(OPENAI_WHISPER_KEY)" {  // Check it was actually substituted
@@ -54,8 +57,8 @@ class AppConfig: ObservableObject {
         }
 
         // No key found - API mode won't work, but local mode will
-        // To use API mode, create Config.xcconfig from Config.xcconfig.example
-        print("[AppConfig] Warning: No API key found. Copy Config.xcconfig.example to Config.xcconfig and add your key.")
+        // To use API mode, add a provider in Settings
+        print("[AppConfig] Warning: No API key found in Info.plist. Add a provider in Settings.")
         return ""
     }
 

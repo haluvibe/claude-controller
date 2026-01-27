@@ -65,6 +65,7 @@ struct TrackpadView: View {
 struct StatusBar: View {
     @ObservedObject var connectionManager: ConnectionManager
     @ObservedObject var macroManager: MacroManager
+    @State private var showSettings = false
 
     /// Get version from Bundle
     private var appVersion: String {
@@ -121,7 +122,17 @@ struct StatusBar: View {
                         .foregroundColor(.gray)
                 }
             }
-            .padding(.trailing, 16)
+
+            // Settings button
+            Button(action: { showSettings = true }) {
+                Image(systemName: "gearshape.fill")
+                    .font(.system(size: 16))
+                    .foregroundColor(.gray)
+            }
+            .padding(.horizontal, 12)
+            .sheet(isPresented: $showSettings) {
+                SettingsView(providerManager: ProviderManager.shared)
+            }
         }
     }
 
@@ -180,8 +191,7 @@ struct ToolbarView: View {
         self._showKeyboard = showKeyboard
         self.connectionManager = connectionManager
         self._dictationManager = StateObject(wrappedValue: DictationManager(
-            connectionManager: connectionManager,
-            apiKey: AppConfig.whisperAPIKey
+            connectionManager: connectionManager
         ))
     }
 

@@ -22,6 +22,9 @@
 		AAA00013 /* MacroManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBB00014 /* MacroManager.swift */; };
 		AAA00014 /* MacroBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBB00015 /* MacroBarView.swift */; };
 		AAA00015 /* AttentionIndicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBB00016 /* AttentionIndicator.swift */; };
+		AAA00016 /* ProviderManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBB00017 /* ProviderManager.swift */; };
+		AAA00017 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBB00018 /* SettingsView.swift */; };
+		AAA00018 /* ProviderFormView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBB00019 /* ProviderFormView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -41,6 +44,9 @@
 		BBB00014 /* MacroManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacroManager.swift; sourceTree = "<group>"; };
 		BBB00015 /* MacroBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacroBarView.swift; sourceTree = "<group>"; };
 		BBB00016 /* AttentionIndicator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AttentionIndicator.swift; sourceTree = "<group>"; };
+		BBB00017 /* ProviderManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProviderManager.swift; sourceTree = "<group>"; };
+		BBB00018 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		BBB00019 /* ProviderFormView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProviderFormView.swift; sourceTree = "<group>"; };
 		CCC00001 /* TrackpadController.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TrackpadController.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -95,6 +101,8 @@
 				BBB00011 /* DictationButton.swift */,
 				BBB00003 /* KeyboardView.swift */,
 				BBB00015 /* MacroBarView.swift */,
+				BBB00019 /* ProviderFormView.swift */,
+				BBB00018 /* SettingsView.swift */,
 				BBB00002 /* TrackpadView.swift */,
 			);
 			path = Views;
@@ -139,6 +147,7 @@
 			isa = PBXGroup;
 			children = (
 				BBB00010 /* AppConfig.swift */,
+				BBB00017 /* ProviderManager.swift */,
 			);
 			path = Config;
 			sourceTree = "<group>";
@@ -239,6 +248,9 @@
 				AAA00013 /* MacroManager.swift in Sources */,
 				AAA00014 /* MacroBarView.swift in Sources */,
 				AAA00015 /* AttentionIndicator.swift in Sources */,
+				AAA00016 /* ProviderManager.swift in Sources */,
+				AAA00017 /* SettingsView.swift in Sources */,
+				AAA00018 /* ProviderFormView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

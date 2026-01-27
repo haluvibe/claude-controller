@@ -1,28 +1,60 @@
 // WhisperService.swift
-// iPad Trackpad Controller - OpenAI Whisper API Integration
+// iPad Trackpad Controller - Whisper API Integration (Multi-Provider)
 // iOS 18+ / iPadOS 18+
 
 import Foundation
 
-/// Service for transcribing audio using OpenAI Whisper API
-class WhisperService {
+/// Configuration for a transcription provider
+struct WhisperConfig {
+    let apiKey: String
+    let endpoint: String
+    let model: String
 
-    private let apiKey: String
-    private let endpoint = "https://api.openai.com/v1/audio/transcriptions"
-
-    init(apiKey: String) {
+    init(apiKey: String, endpoint: String, model: String) {
         self.apiKey = apiKey
+        self.endpoint = endpoint
+        self.model = model
     }
 
-    /// Transcribe audio data using OpenAI Whisper
+    /// Create config from a TranscriptionProvider
+    init?(provider: TranscriptionProvider, apiKey: String?) {
+        guard let key = apiKey, !key.isEmpty else { return nil }
+        self.apiKey = key
+        self.endpoint = provider.endpoint
+        self.model = provider.model
+    }
+
+    /// Legacy OpenAI-only config
+    init(apiKey: String) {
+        self.apiKey = apiKey
+        self.endpoint = "https://api.openai.com/v1/audio/transcriptions"
+        self.model = "whisper-1"
+    }
+}
+
+/// Service for transcribing audio using Whisper-compatible APIs
+class WhisperService {
+
+    private let config: WhisperConfig
+
+    init(config: WhisperConfig) {
+        self.config = config
+    }
+
+    /// Legacy initializer for backwards compatibility
+    init(apiKey: String) {
+        self.config = WhisperConfig(apiKey: apiKey)
+    }
+
+    /// Transcribe audio data using the configured Whisper API
     /// - Parameter audioData: Audio data in supported format (m4a, mp3, wav, etc.)
     /// - Returns: Transcribed text
     func transcribe(audioData: Data, format: String = "m4a") async throws -> String {
         let boundary = UUID().uuidString
 
-        var request = URLRequest(url: URL(string: endpoint)!)
+        var request = URLRequest(url: URL(string: config.endpoint)!)
         request.httpMethod = "POST"
-        request.setValue("Bearer \(apiKey)", forHTTPHeaderField: "Authorization")
+        request.setValue("Bearer \(config.apiKey)", forHTTPHeaderField: "Authorization")
         request.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
 
         var body = Data()
@@ -30,7 +62,7 @@ class WhisperService {
         // Add model field
         body.append("--\(boundary)\r\n".data(using: .utf8)!)
         body.append("Content-Disposition: form-data; name=\"model\"\r\n\r\n".data(using: .utf8)!)
-        body.append("whisper-1\r\n".data(using: .utf8)!)
+        body.append("\(config.model)\r\n".data(using: .utf8)!)
 
         // Add audio file
         body.append("--\(boundary)\r\n".data(using: .utf8)!)

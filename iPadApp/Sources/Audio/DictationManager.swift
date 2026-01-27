@@ -22,16 +22,15 @@ class DictationManager: ObservableObject {
     @Published private(set) var modelLoadProgress: Double = 0
 
     private let audioRecorder = AudioRecorder()
-    private let whisperService: WhisperService
     private let localWhisperService = LocalWhisperService()
     private let connectionManager: ConnectionManager
     private let appConfig = AppConfig.shared
+    private let providerManager = ProviderManager.shared
 
     private var cancellables = Set<AnyCancellable>()
 
-    init(connectionManager: ConnectionManager, apiKey: String) {
+    init(connectionManager: ConnectionManager) {
         self.connectionManager = connectionManager
-        self.whisperService = WhisperService(apiKey: apiKey)
 
         // Observe recorder state
         Task {
@@ -131,6 +130,13 @@ class DictationManager: ObservableObject {
             switch appConfig.transcriptionMode {
             case .api:
                 print("[DictationManager] Using API transcription...")
+                guard let provider = providerManager.activeProvider,
+                      let apiKey = providerManager.getAPIKey(for: provider.id) else {
+                    throw NSError(domain: "DictationManager", code: -1,
+                        userInfo: [NSLocalizedDescriptionKey: "No transcription provider configured. Add one in Settings."])
+                }
+                let config = WhisperConfig(apiKey: apiKey, endpoint: provider.endpoint, model: provider.model)
+                let whisperService = WhisperService(config: config)
                 text = try await whisperService.transcribe(audioData: audioData)
 
             case .local:
