@@ -39,7 +39,7 @@ struct DictationButton: View {
                 }
             }
         }
-        .disabled(dictationManager.isTranscribing)
+        .disabled(dictationManager.isTranscribing || dictationManager.isLocalModelLoading)
         .alert("Microphone Access Required", isPresented: $showingPermissionAlert) {
             Button("Open Settings") {
                 if let url = URL(string: UIApplication.openSettingsURLString) {
@@ -60,6 +60,8 @@ struct DictationButton: View {
             return .red
         } else if dictationManager.isTranscribing {
             return .orange
+        } else if dictationManager.isLocalModelLoading {
+            return .purple
         } else {
             return .blue
         }
@@ -78,6 +80,17 @@ struct DictationButton: View {
         } else {
             // Start recording
             Task {
+                // Check if local mode needs model loaded first
+                if AppConfig.shared.transcriptionMode == .local && !dictationManager.isLocalModelReady {
+                    // Start loading and wait
+                    await dictationManager.loadLocalModel()
+
+                    // If still not ready, don't start recording
+                    if !dictationManager.isLocalModelReady {
+                        return
+                    }
+                }
+
                 if !hasPermission {
                     hasPermission = await dictationManager.requestPermission()
                 }
@@ -96,14 +109,82 @@ struct DictationButton: View {
     }
 }
 
-// MARK: - Dictation Status View (optional - shows transcription result)
+// MARK: - Mode Toggle Button
 
-struct DictationStatusView: View {
+struct TranscriptionModeToggle: View {
+    @ObservedObject var appConfig = AppConfig.shared
     @ObservedObject var dictationManager: DictationManager
 
     var body: some View {
-        VStack(spacing: 4) {
-            if dictationManager.isRecording {
+        Button(action: toggleMode) {
+            HStack(spacing: 4) {
+                Image(systemName: appConfig.transcriptionMode.icon)
+                    .font(.system(size: 14, weight: .medium))
+
+                if dictationManager.isLocalModelLoading {
+                    ProgressView()
+                        .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                        .scaleEffect(0.7)
+                }
+            }
+            .foregroundColor(.white)
+            .frame(width: 50, height: 36)
+            .background(modeColor)
+            .cornerRadius(8)
+        }
+        .disabled(dictationManager.isRecording || dictationManager.isTranscribing)
+    }
+
+    private var modeColor: Color {
+        switch appConfig.transcriptionMode {
+        case .api:
+            return Color.blue.opacity(0.8)
+        case .local:
+            return dictationManager.isLocalModelReady ? Color.green.opacity(0.8) : Color.purple.opacity(0.8)
+        }
+    }
+
+    private func toggleMode() {
+        withAnimation(.easeInOut(duration: 0.2)) {
+            if appConfig.transcriptionMode == .api {
+                appConfig.transcriptionMode = .local
+                // Start loading local model if not ready
+                if !dictationManager.isLocalModelReady {
+                    Task {
+                        await dictationManager.loadLocalModel()
+                    }
+                }
+            } else {
+                appConfig.transcriptionMode = .api
+            }
+        }
+    }
+}
+
+// MARK: - Dictation Status View
+
+struct DictationStatusView: View {
+    @ObservedObject var dictationManager: DictationManager
+    @ObservedObject var appConfig = AppConfig.shared
+
+    var body: some View {
+        HStack(spacing: 8) {
+            // Mode indicator
+            Text(appConfig.transcriptionMode.displayName)
+                .font(.system(size: 10, weight: .medium))
+                .foregroundColor(appConfig.transcriptionMode == .api ? .blue : .green)
+
+            // Status
+            if dictationManager.isLocalModelLoading {
+                HStack(spacing: 4) {
+                    Text("Loading model...")
+                        .font(.system(size: 10))
+                        .foregroundColor(.purple)
+                    Text("\(Int(dictationManager.modelDownloadProgress * 100))%")
+                        .font(.system(size: 10, weight: .medium, design: .monospaced))
+                        .foregroundColor(.purple)
+                }
+            } else if dictationManager.isRecording {
                 HStack(spacing: 4) {
                     Circle()
                         .fill(Color.red)
@@ -122,7 +203,7 @@ struct DictationStatusView: View {
                     .foregroundColor(.red)
                     .lineLimit(1)
             } else if let text = dictationManager.lastTranscription {
-                Text("Sent: \(text.prefix(30))...")
+                Text("Sent: \(text.prefix(25))...")
                     .font(.system(size: 10))
                     .foregroundColor(.green)
                     .lineLimit(1)

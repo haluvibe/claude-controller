@@ -4,8 +4,9 @@
 
 import Foundation
 import AVFoundation
+import Combine
 
-/// Orchestrates audio recording and Whisper transcription
+/// Orchestrates audio recording and transcription (API or Local)
 @MainActor
 class DictationManager: ObservableObject {
 
@@ -15,9 +16,18 @@ class DictationManager: ObservableObject {
     @Published private(set) var lastError: String?
     @Published private(set) var lastTranscription: String?
 
+    // Local model state
+    @Published private(set) var localModelState: LocalWhisperService.ModelState = .notLoaded
+    @Published private(set) var modelDownloadProgress: Double = 0
+    @Published private(set) var modelLoadProgress: Double = 0
+
     private let audioRecorder = AudioRecorder()
     private let whisperService: WhisperService
+    private let localWhisperService = LocalWhisperService()
     private let connectionManager: ConnectionManager
+    private let appConfig = AppConfig.shared
+
+    private var cancellables = Set<AnyCancellable>()
 
     init(connectionManager: ConnectionManager, apiKey: String) {
         self.connectionManager = connectionManager
@@ -34,6 +44,43 @@ class DictationManager: ObservableObject {
                 self.recordingTime = time
             }
         }
+
+        // Observe local model state
+        localWhisperService.$modelState
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] state in
+                self?.localModelState = state
+            }
+            .store(in: &cancellables)
+
+        localWhisperService.$downloadProgress
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] progress in
+                self?.modelDownloadProgress = progress
+            }
+            .store(in: &cancellables)
+
+        localWhisperService.$loadProgress
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] progress in
+                self?.modelLoadProgress = progress
+            }
+            .store(in: &cancellables)
+    }
+
+    /// Current transcription mode
+    var transcriptionMode: TranscriptionMode {
+        appConfig.transcriptionMode
+    }
+
+    /// Whether local model is ready
+    var isLocalModelReady: Bool {
+        localModelState.isReady
+    }
+
+    /// Whether local model is currently loading
+    var isLocalModelLoading: Bool {
+        localModelState.isLoading
     }
 
     /// Request microphone permission
@@ -43,6 +90,16 @@ class DictationManager: ObservableObject {
                 continuation.resume(returning: granted)
             }
         }
+    }
+
+    /// Load the local whisper model (call this when switching to local mode)
+    func loadLocalModel() async {
+        await localWhisperService.loadModel()
+    }
+
+    /// Unload the local model to free memory
+    func unloadLocalModel() {
+        localWhisperService.unloadModel()
     }
 
     /// Start recording audio
@@ -69,8 +126,34 @@ class DictationManager: ObservableObject {
         defer { isTranscribing = false }
 
         do {
-            print("[DictationManager] Sending \(audioData.count) bytes to Whisper API...")
-            let text = try await whisperService.transcribe(audioData: audioData)
+            let text: String
+
+            switch appConfig.transcriptionMode {
+            case .api:
+                print("[DictationManager] Using API transcription...")
+                text = try await whisperService.transcribe(audioData: audioData)
+
+            case .local:
+                print("[DictationManager] Using local transcription...")
+                // Ensure model is loaded
+                if !localModelState.isReady {
+                    print("[DictationManager] Local model not ready, loading...")
+                    await loadLocalModel()
+
+                    // Check if model loaded successfully
+                    if case .error(let errorMsg) = localModelState {
+                        throw NSError(domain: "LocalWhisper", code: -1,
+                            userInfo: [NSLocalizedDescriptionKey: "Model failed to load: \(errorMsg)"])
+                    }
+
+                    // Still not ready after loading attempt
+                    if !localModelState.isReady {
+                        throw NSError(domain: "LocalWhisper", code: -2,
+                            userInfo: [NSLocalizedDescriptionKey: "Model is still loading. Please wait and try again."])
+                    }
+                }
+                text = try await localWhisperService.transcribe(audioData: audioData)
+            }
 
             guard !text.isEmpty else {
                 lastError = "No speech detected"
@@ -78,7 +161,7 @@ class DictationManager: ObservableObject {
             }
 
             lastTranscription = text
-            print("[DictationManager] Transcribed: \(text)")
+            print("[DictationManager] Transcribed (\(appConfig.transcriptionMode.rawValue)): \(text)")
 
             // Send to Mac for typing
             connectionManager.sendTextToType(text)

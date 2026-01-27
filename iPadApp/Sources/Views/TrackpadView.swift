@@ -68,7 +68,7 @@ struct StatusBar: View {
 
             // Version and connected Mac name
             HStack(spacing: 8) {
-                Text("v1.1")
+                Text("v1.2")
                     .font(.system(size: 10, weight: .medium, design: .monospaced))
                     .foregroundColor(.orange)
 
@@ -176,6 +176,9 @@ struct ToolbarView: View {
                 }
 
                 Spacer()
+
+                // Mode toggle (API/Local)
+                TranscriptionModeToggle(dictationManager: dictationManager)
 
                 // Dictation button (microphone)
                 DictationButton(dictationManager: dictationManager)
