@@ -350,6 +350,22 @@ class ConnectionManager: ObservableObject {
             modifiers: modifiers
         ))
     }
+
+    func sendThreeFingerSwipe(direction: String) {
+        var message = ControlMessage(type: .threeFingerSwipe)
+        message.swipeDirection = direction
+        queueMessage(message)
+    }
+
+    // MARK: - Public API - Text Input (Dictation)
+
+    /// Send text to be typed on Mac (for dictation feature)
+    func sendTextToType(_ text: String) {
+        var message = ControlMessage(type: .textToType)
+        message.text = text
+        queueMessage(message)
+        print("[ConnectionManager] Sent text to type: \(text.prefix(50))...")
+    }
 }
 
 // MARK: - Message Types
@@ -372,7 +388,11 @@ struct ControlMessage: Codable {
         case keyUp
         case keyPress
         case text
+        case threeFingerSwipe
+        case textToType  // For dictation - types text into focused Mac app
     }
+
+    var swipeDirection: String?
 }
 
 struct MessageBatch: Codable {

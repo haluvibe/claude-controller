@@ -6,6 +6,7 @@ import SwiftUI
 
 struct KeyboardView: View {
     @ObservedObject var connectionManager: ConnectionManager
+    var onDismiss: (() -> Void)? = nil
 
     // Modifier state
     @State private var isShiftActive = false
@@ -14,30 +15,55 @@ struct KeyboardView: View {
     @State private var isControlActive = false
 
     var body: some View {
-        VStack(spacing: 6) {
-            // Row 1: Numbers
-            KeyRow(keys: row1Keys, connectionManager: connectionManager, isShiftActive: isShiftActive, modifiers: currentModifiers)
+        GeometryReader { geometry in
+            let keyboardWidth = geometry.size.width
 
-            // Row 2: QWERTY
-            KeyRow(keys: row2Keys, connectionManager: connectionManager, isShiftActive: isShiftActive, modifiers: currentModifiers)
+            VStack(spacing: 6) {
+                // Dismiss handle at top
+                HStack {
+                    Spacer()
+                    Button(action: { onDismiss?() }) {
+                        HStack(spacing: 4) {
+                            Image(systemName: "keyboard.chevron.compact.down")
+                                .font(.system(size: 14))
+                            Text("Hide")
+                                .font(.system(size: 12, weight: .medium))
+                        }
+                        .foregroundColor(.gray)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 6)
+                        .background(Color(white: 0.2))
+                        .cornerRadius(12)
+                    }
+                    Spacer()
+                }
+                .padding(.bottom, 4)
 
-            // Row 3: ASDF
-            KeyRow(keys: row3Keys, connectionManager: connectionManager, isShiftActive: isShiftActive, modifiers: currentModifiers)
+                // Row 1: Numbers
+                KeyRow(keys: row1Keys, connectionManager: connectionManager, isShiftActive: isShiftActive, modifiers: currentModifiers, containerWidth: keyboardWidth)
 
-            // Row 4: ZXCV
-            KeyRow(keys: row4Keys, connectionManager: connectionManager, isShiftActive: isShiftActive, modifiers: currentModifiers)
+                // Row 2: QWERTY
+                KeyRow(keys: row2Keys, connectionManager: connectionManager, isShiftActive: isShiftActive, modifiers: currentModifiers, containerWidth: keyboardWidth)
 
-            // Row 5: Modifiers + Space
-            ModifierRow(
-                connectionManager: connectionManager,
-                isShiftActive: $isShiftActive,
-                isCommandActive: $isCommandActive,
-                isOptionActive: $isOptionActive,
-                isControlActive: $isControlActive
-            )
+                // Row 3: ASDF
+                KeyRow(keys: row3Keys, connectionManager: connectionManager, isShiftActive: isShiftActive, modifiers: currentModifiers, containerWidth: keyboardWidth)
+
+                // Row 4: ZXCV
+                KeyRow(keys: row4Keys, connectionManager: connectionManager, isShiftActive: isShiftActive, modifiers: currentModifiers, containerWidth: keyboardWidth)
+
+                // Row 5: Modifiers + Space
+                ModifierRow(
+                    connectionManager: connectionManager,
+                    isShiftActive: $isShiftActive,
+                    isCommandActive: $isCommandActive,
+                    isOptionActive: $isOptionActive,
+                    isControlActive: $isControlActive
+                )
+            }
+            .padding(.horizontal, 8)
+            .padding(.vertical, 12)
+            .frame(width: keyboardWidth)
         }
-        .padding(.horizontal, 8)
-        .padding(.vertical, 12)
         .background(Color(white: 0.12))
     }
 
@@ -131,6 +157,7 @@ struct KeyRow: View {
     let connectionManager: ConnectionManager
     let isShiftActive: Bool
     let modifiers: UInt32
+    var containerWidth: CGFloat = UIScreen.main.bounds.width
 
     var body: some View {
         HStack(spacing: 4) {
@@ -139,7 +166,8 @@ struct KeyRow: View {
                     key: key,
                     isShiftActive: isShiftActive,
                     modifiers: modifiers,
-                    connectionManager: connectionManager
+                    connectionManager: connectionManager,
+                    containerWidth: containerWidth
                 )
             }
         }
@@ -153,6 +181,7 @@ struct KeyButton: View {
     let isShiftActive: Bool
     let modifiers: UInt32
     let connectionManager: ConnectionManager
+    var containerWidth: CGFloat = UIScreen.main.bounds.width
 
     private var displayLabel: String {
         if key.label.count == 1 {
@@ -179,12 +208,14 @@ struct KeyButton: View {
     }
 
     private var baseKeyWidth: CGFloat {
-        // Calculate based on screen width
-        let screenWidth = UIScreen.main.bounds.width
-        let totalKeys: CGFloat = 10.5
-        let spacing: CGFloat = 4 * 10
-        let padding: CGFloat = 16
-        return (screenWidth - spacing - padding) / totalKeys
+        // Calculate based on container width
+        // Row 1 has 10 regular keys + 1 delete (1.5 width) = 11.5 units total
+        // Gaps: 10 keys means 10 gaps at 4px each = 40px
+        // Horizontal padding: 8px each side = 16px total
+        let totalKeyUnits: CGFloat = 11.5
+        let gaps: CGFloat = 10 * 4  // 10 gaps at 4px
+        let horizontalPadding: CGFloat = 8 * 2  // padding on both sides
+        return (containerWidth - gaps - horizontalPadding) / totalKeyUnits
     }
 }
 
@@ -315,6 +346,7 @@ struct ArrowButton: View {
 // MARK: - Preview
 
 #Preview {
-    KeyboardView(connectionManager: ConnectionManager())
+    KeyboardView(connectionManager: ConnectionManager(), onDismiss: {})
+        .frame(height: 300)
         .background(Color.black)
 }

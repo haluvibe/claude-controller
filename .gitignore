@@ -1,16 +1,17 @@
 # macOS
-.DS_Store
+**/.DS_Store
 *.swp
 
 # Xcode
-*.xcuserstate
-xcuserdata/
-DerivedData/
-*.xcworkspace/xcuserdata/
+**/*.xcuserstate
+**/xcuserdata/
+**/DerivedData/
+build/
+*.xcworkspace/
 
 # Swift Package Manager
-.build/
-.swiftpm/
+**/.build/
+**/.swiftpm/
 Packages/
 
 # Node
@@ -31,3 +32,22 @@ macOS/ClaudeController.app/Contents/MacOS/ClaudeController
 
 # Logs
 *.log
+
+# Environment and secrets - NEVER commit API keys!
+.env
+.env.*
+!.env.example
+Config.plist
+Secrets.plist
+**/Secrets/
+*.secret
+
+# Xcode config files with secrets
+*.xcconfig
+!*.xcconfig.example
+
+# Provisioning and certificates
+*.mobileprovision
+*.provisionprofile
+*.p12
+*.cer

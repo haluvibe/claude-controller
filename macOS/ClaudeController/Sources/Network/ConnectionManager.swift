@@ -28,7 +28,11 @@ struct ControlMessage: Codable, Sendable {
         case keyUp
         case keyPress
         case text
+        case threeFingerSwipe
+        case textToType  // For dictation - types text into focused app
     }
+
+    var swipeDirection: String?
 }
 
 // MARK: - Connection Manager
@@ -309,6 +313,18 @@ final class ConnectionManager: ObservableObject {
 
         case .text:
             if let text = message.text {
+                injector.typeText(text)
+            }
+
+        case .threeFingerSwipe:
+            if let direction = message.swipeDirection {
+                injector.threeFingerSwipe(direction: direction)
+            }
+
+        case .textToType:
+            // Dictation: type the transcribed text into focused app
+            if let text = message.text {
+                print("🎤 Typing dictated text: \(text.prefix(50))...")
                 injector.typeText(text)
             }
         }

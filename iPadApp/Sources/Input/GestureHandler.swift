@@ -13,6 +13,11 @@ class GestureHandlerView: UIView {
     var onClick: (() -> Void)?
     var onRightClick: (() -> Void)?
     var onScroll: ((CGFloat, CGFloat) -> Void)?
+    var onThreeFingerSwipe: ((SwipeDirection) -> Void)?
+
+    enum SwipeDirection: String {
+        case left, right, up, down
+    }
 
     // MARK: - Touch Tracking
 
@@ -21,6 +26,9 @@ class GestureHandlerView: UIView {
     private var touchStartPosition: CGPoint?
     private var activeTouches: [UITouch] = []
     private var previousTwoFingerCenter: CGPoint?
+    private var threeFingerStartCenter: CGPoint?
+    private var threeFingerStartTime: Date?
+    private var maxTouchCountDuringGesture: Int = 0  // Track max fingers during gesture
 
     // MARK: - Configuration
 
@@ -62,6 +70,9 @@ class GestureHandlerView: UIView {
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         activeTouches.append(contentsOf: touches)
 
+        // Track maximum touch count during this gesture
+        maxTouchCountDuringGesture = max(maxTouchCountDuringGesture, activeTouches.count)
+
         if activeTouches.count == 1 {
             // Single finger touch start
             if let touch = touches.first {
@@ -74,6 +85,10 @@ class GestureHandlerView: UIView {
             // Two finger touch start
             touchStartTime = Date()
             previousTwoFingerCenter = calculateCenter(of: activeTouches)
+        } else if activeTouches.count == 3 {
+            // Three finger touch start
+            threeFingerStartTime = Date()
+            threeFingerStartCenter = calculateCenter(of: activeTouches)
         }
     }
 
@@ -163,8 +178,8 @@ class GestureHandlerView: UIView {
         if let startTime = touchStartTime {
             let duration = Date().timeIntervalSince(startTime)
 
-            if touchCountBefore == 1 {
-                // Check for single finger tap
+            if touchCountBefore == 1 && maxTouchCountDuringGesture == 1 {
+                // Check for single finger tap - only if we NEVER had more than 1 finger
                 if duration < tapMaxDuration {
                     if let startPos = touchStartPosition,
                        let touch = touches.first {
@@ -177,7 +192,7 @@ class GestureHandlerView: UIView {
                         }
                     }
                 }
-            } else if touchCountBefore == 2 {
+            } else if touchCountBefore == 2 && maxTouchCountDuringGesture == 2 {
                 // Check for two finger tap (right click)
                 if duration < twoFingerTapMaxDuration {
                     let allTouchesEnded = activeTouches.isEmpty
@@ -193,6 +208,39 @@ class GestureHandlerView: UIView {
 
                         if totalMovement < tapMaxMovement * 2 {
                             onRightClick?()
+                        }
+                    }
+                }
+            } else if touchCountBefore == 3 {
+                // Check for three finger swipe
+                if let startCenter = threeFingerStartCenter,
+                   let startTime = threeFingerStartTime {
+                    let swipeDuration = Date().timeIntervalSince(startTime)
+                    let endCenter = calculateCenter(of: Array(touches))
+                    let deltaX = endCenter.x - startCenter.x
+                    let deltaY = endCenter.y - startCenter.y
+                    let distance = hypot(deltaX, deltaY)
+
+                    // Swipe must be fast and travel minimum distance
+                    let minSwipeDistance: CGFloat = 50
+                    let maxSwipeDuration: TimeInterval = 0.5
+
+                    if distance > minSwipeDistance && swipeDuration < maxSwipeDuration {
+                        // Determine direction based on dominant axis
+                        if abs(deltaX) > abs(deltaY) {
+                            // Horizontal swipe
+                            if deltaX > 0 {
+                                onThreeFingerSwipe?(.right)
+                            } else {
+                                onThreeFingerSwipe?(.left)
+                            }
+                        } else {
+                            // Vertical swipe
+                            if deltaY > 0 {
+                                onThreeFingerSwipe?(.down)
+                            } else {
+                                onThreeFingerSwipe?(.up)
+                            }
                         }
                     }
                 }
@@ -242,8 +290,11 @@ class GestureHandlerView: UIView {
         touchStartTime = nil
         touchStartPosition = nil
         previousTwoFingerCenter = nil
+        threeFingerStartCenter = nil
+        threeFingerStartTime = nil
         activeTouches.removeAll()
         lastMoveTime = nil
         velocityHistory.removeAll()
+        maxTouchCountDuringGesture = 0
     }
 }
