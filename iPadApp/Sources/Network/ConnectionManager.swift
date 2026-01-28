@@ -284,9 +284,32 @@ class ConnectionManager: ObservableObject {
                 macroManager?.clearOptions()
             case "notification":
                 handleNotificationData(data)
+            case "permissionRequest":
+                handlePermissionRequestData(data)
             default:
                 print("[ConnectionManager] Unknown message type: \(response.type)")
             }
+        }
+    }
+
+    private func handlePermissionRequestData(_ data: Data) {
+        do {
+            let request = try JSONDecoder().decode(PermissionRequestMessage.self, from: data)
+            print("[ConnectionManager] 🔐 Permission request: \(request.tool) - \(request.details.prefix(50)) with \(request.options.count) options")
+
+            // Convert message options to PermissionOption
+            let options = request.options.map { opt in
+                PermissionOption(number: opt.number, text: opt.text, decision: opt.decision)
+            }
+
+            macroManager?.showPermissionRequest(
+                requestId: request.requestId,
+                tool: request.tool,
+                details: request.details,
+                options: options
+            )
+        } catch {
+            print("[ConnectionManager] Failed to decode permission request: \(error)")
         }
     }
 
@@ -459,6 +482,17 @@ class ConnectionManager: ObservableObject {
         queueMessage(message)
         print("[ConnectionManager] Sent macro selection (no Enter): \(optionNumber)")
     }
+
+    // MARK: - Public API - Permission Response
+
+    /// Send permission decision back to Mac
+    func sendPermissionResponse(requestId: String, decision: String) {
+        var message = ControlMessage(type: .permissionResponse)
+        message.permissionRequestId = requestId
+        message.permissionDecision = decision
+        queueMessage(message)
+        print("[ConnectionManager] 🔐 Sent permission response: \(requestId) -> \(decision)")
+    }
 }
 
 // MARK: - Message Types
@@ -486,9 +520,14 @@ struct ControlMessage: Codable {
         case threeFingerSwipe
         case textToType  // For dictation - types text into focused Mac app
         case macroSelect // For macro keyboard - types selected option number + Enter
+        case permissionResponse // Send permission decision back to Mac
     }
 
     var swipeDirection: String?
+
+    // Permission response fields
+    var permissionRequestId: String?
+    var permissionDecision: String?  // "allow" or "deny"
 }
 
 struct MessageBatch: Codable {
@@ -514,6 +553,23 @@ struct NotificationMessage: Codable {
     let message: String
     let playSound: Bool
     let haptic: Bool
+}
+
+/// Message from macOS requesting permission (Allow/Deny)
+struct PermissionRequestMessage: Codable {
+    let type: String
+    let requestId: String
+    let tool: String
+    let details: String
+    let options: [PermissionOptionMessage]
+    let timestamp: Double
+}
+
+/// Permission option in the message
+struct PermissionOptionMessage: Codable {
+    let number: Int
+    let text: String
+    let decision: String
 }
 
 /// Represents a parsed option from Claude's terminal output

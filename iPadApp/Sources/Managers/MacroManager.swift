@@ -9,6 +9,34 @@ import AudioToolbox
 
 // Note: MacroOption and MacroOptionsMessage are defined in ConnectionManager.swift
 
+/// Represents a pending permission request from Claude Code
+struct PermissionRequest: Identifiable, Equatable {
+    let id: String  // requestId from Mac
+    let tool: String
+    let details: String
+    let options: [PermissionOption]  // The actual options to display
+    let timestamp: Date
+
+    static func == (lhs: PermissionRequest, rhs: PermissionRequest) -> Bool {
+        lhs.id == rhs.id
+    }
+}
+
+/// A permission option (like "Allow", "Allow always", "Deny")
+struct PermissionOption: Identifiable, Equatable, Codable {
+    let id: UUID
+    let number: Int
+    let text: String
+    let decision: String  // The decision value to send back
+
+    init(number: Int, text: String, decision: String) {
+        self.id = UUID()
+        self.number = number
+        self.text = text
+        self.decision = decision
+    }
+}
+
 /// Manages macro options state and alerts
 @MainActor
 class MacroManager: ObservableObject {
@@ -18,6 +46,9 @@ class MacroManager: ObservableObject {
     @Published var needsAttention: Bool = false
     @Published var isBarVisible: Bool = false
     @Published var notificationCount: Int = 0
+
+    /// Current pending permission request (only one at a time)
+    @Published var pendingPermission: PermissionRequest?
 
     // MARK: - Connection Manager (set after init)
     weak var connectionManager: ConnectionManager?
@@ -193,5 +224,50 @@ class MacroManager: ObservableObject {
         // 4095 = vibrate (if available)
         AudioServicesPlayAlertSound(1005)
         print("[MacroManager] Played alert sound 1005")
+    }
+
+    // MARK: - Permission Requests
+
+    /// Show a permission request from Claude Code
+    func showPermissionRequest(requestId: String, tool: String, details: String, options: [PermissionOption]) {
+        pendingPermission = PermissionRequest(
+            id: requestId,
+            tool: tool,
+            details: details,
+            options: options,
+            timestamp: Date()
+        )
+
+        // Always show bar and trigger attention for permissions
+        isBarVisible = true
+        playAttentionAlerts()
+
+        print("[MacroManager] 🔐 Permission request: \(tool) with \(options.count) options")
+    }
+
+    /// User selected a permission option
+    func selectPermissionOption(_ option: PermissionOption) {
+        guard let permission = pendingPermission else {
+            print("[MacroManager] ⚠️ No pending permission to respond to")
+            return
+        }
+
+        // Haptic feedback
+        let isAllow = option.decision.contains("allow")
+        feedbackGenerator?.notificationOccurred(isAllow ? .success : .error)
+        feedbackGenerator?.prepare()
+
+        // Send response to Mac
+        connectionManager?.sendPermissionResponse(requestId: permission.id, decision: option.decision)
+
+        // Clear the permission immediately
+        pendingPermission = nil
+
+        // Hide bar if no regular macro options
+        if options.isEmpty {
+            isBarVisible = false
+        }
+
+        print("[MacroManager] 🔐 Permission response: \(option.decision)")
     }
 }

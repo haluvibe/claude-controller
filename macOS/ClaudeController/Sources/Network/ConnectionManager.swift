@@ -31,12 +31,17 @@ struct ControlMessage: Codable, Sendable {
         case threeFingerSwipe
         case textToType  // For dictation - types text into focused app
         case macroSelect // For macro keyboard - types selected option number + Enter
+        case permissionResponse // From iPad - responds to permission request
     }
 
     var optionNumber: Int?
     var includeEnter: Bool?  // For macroSelect: whether to press Enter after number
 
     var swipeDirection: String?
+
+    // Permission response fields
+    var permissionRequestId: String?
+    var permissionDecision: String?  // "allow" or "deny"
 }
 
 // MARK: - Connection Manager
@@ -48,6 +53,9 @@ final class ConnectionManager: ObservableObject {
     @Published var messageCount = 0
 
     var onConnectionStateChanged: (@Sendable (Bool) -> Void)?
+
+    /// Callback when iPad responds to a permission request
+    var onPermissionResponse: ((String, String) -> Void)?  // (requestId, decision)
 
     private var listener: NWListener?
     private var connection: NWConnection?
@@ -345,6 +353,14 @@ final class ConnectionManager: ObservableObject {
                     }
                 }
             }
+
+        case .permissionResponse:
+            // iPad responded to a permission request
+            if let requestId = message.permissionRequestId,
+               let decision = message.permissionDecision {
+                print("🔐 Permission response from iPad: \(requestId) -> \(decision)")
+                onPermissionResponse?(requestId, decision)
+            }
         }
     }
 
@@ -423,6 +439,22 @@ final class ConnectionManager: ObservableObject {
         ]
         sendJSON(msg)
         print("🔔 Sent notification to iPad: \(message)")
+    }
+
+    // MARK: - Permission Requests
+
+    /// Send permission request to iPad with options
+    func sendPermissionRequest(requestId: String, tool: String, details: String, options: [[String: Any]]) {
+        let message: [String: Any] = [
+            "type": "permissionRequest",
+            "requestId": requestId,
+            "tool": tool,
+            "details": details,
+            "options": options,
+            "timestamp": Date().timeIntervalSince1970
+        ]
+        sendJSON(message)
+        print("🔐 Sent permission request to iPad: \(tool) with \(options.count) options")
     }
 }
 

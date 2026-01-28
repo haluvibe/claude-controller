@@ -5,11 +5,22 @@
 import Foundation
 import Network
 
+/// Pending permission request waiting for iPad response
+struct PendingPermission {
+    let connection: NWConnection
+    let requestId: String
+    let timestamp: Date
+}
+
 /// HTTP server that receives commands from the Claude Controller MCP server
 /// and bridges them to the iPad via ConnectionManager
 class MCPBridgeServer {
     private var listener: NWListener?
     private let port: UInt16 = 19847
+
+    /// Pending permission requests waiting for iPad response (requestId -> pending)
+    private var pendingPermissions: [String: PendingPermission] = [:]
+    private let permissionLock = NSLock()
 
     // MARK: - Callbacks
 
@@ -24,6 +35,9 @@ class MCPBridgeServer {
 
     /// Get connection status
     var getConnectionStatus: (() -> (connected: Bool, deviceName: String?))?
+
+    /// Permission request received - forward to iPad (requestId, tool, details, options)
+    var onPermissionRequest: ((String, String, String, [[String: Any]]) -> Void)?
 
     init() {}
 
@@ -198,9 +212,65 @@ class MCPBridgeServer {
                 "version": "1.0.0"
             ])
 
+        // ============ PERMISSION REQUEST (BLOCKING) ============
+        case ("POST", "/permission-request"):
+            let tool = json["tool"] as? String ?? "Unknown"
+            let details = json["details"] as? String ?? ""
+            let options = json["options"] as? [[String: Any]] ?? []
+            let requestId = UUID().uuidString
+
+            // Store pending request - DON'T respond yet
+            permissionLock.lock()
+            pendingPermissions[requestId] = PendingPermission(
+                connection: connection,
+                requestId: requestId,
+                timestamp: Date()
+            )
+            permissionLock.unlock()
+
+            // Forward to iPad via callback
+            DispatchQueue.main.async {
+                self.onPermissionRequest?(requestId, tool, details, options)
+            }
+
+            print("🔐 MCP: Permission request \(requestId) for \(tool) with \(options.count) options - waiting for iPad response...")
+            // NOTE: We do NOT call sendResponse here - the connection stays open
+            // until resolvePermission() is called with the iPad's decision
+
         default:
             sendResponse(connection, status: "404 Not Found", body: ["error": "Unknown endpoint: \(path)"])
         }
+    }
+
+    // MARK: - Permission Resolution
+
+    /// Resolve a pending permission request with the iPad's decision
+    func resolvePermission(requestId: String, decision: String) {
+        permissionLock.lock()
+        guard let pending = pendingPermissions.removeValue(forKey: requestId) else {
+            permissionLock.unlock()
+            print("⚠️ Permission request \(requestId) not found or already resolved")
+            return
+        }
+        permissionLock.unlock()
+
+        print("🔐 Resolving permission \(requestId) with decision: \(decision)")
+        sendResponse(pending.connection, status: "200 OK", body: ["decision": decision])
+    }
+
+    /// Clean up stale pending permissions (older than timeout)
+    func cleanupStalePermissions(olderThan timeout: TimeInterval = 300) {
+        let cutoff = Date().addingTimeInterval(-timeout)
+
+        permissionLock.lock()
+        let staleIds = pendingPermissions.filter { $0.value.timestamp < cutoff }.map { $0.key }
+        for id in staleIds {
+            if let pending = pendingPermissions.removeValue(forKey: id) {
+                print("⚠️ Permission request \(id) timed out")
+                sendResponse(pending.connection, status: "200 OK", body: ["decision": "deny", "reason": "timeout"])
+            }
+        }
+        permissionLock.unlock()
     }
 
     private func sendResponse(_ connection: NWConnection, status: String, body: [String: Any]) {

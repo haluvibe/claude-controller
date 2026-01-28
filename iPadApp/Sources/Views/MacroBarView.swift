@@ -5,6 +5,7 @@
 import SwiftUI
 
 /// Displays macro option buttons - always shows Accept button, plus any Claude options
+/// Also shows permission prompts when Claude Code needs Allow/Deny
 struct MacroBarView: View {
     @ObservedObject var macroManager: MacroManager
     let connectionManager: ConnectionManager
@@ -12,25 +13,38 @@ struct MacroBarView: View {
     var body: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 8) {
-                // Accept Suggestion button (Right Arrow + Enter for CLI autocomplete)
-                // Always shown as the first option
-                AcceptSuggestionButton(connectionManager: connectionManager)
+                // Permission request options (takes priority)
+                if let permission = macroManager.pendingPermission {
+                    // Show permission context label
+                    PermissionLabel(tool: permission.tool)
 
-                // Claude's numbered options (when available)
-                ForEach(macroManager.options) { option in
-                    MacroButton(option: option) {
-                        let number = macroManager.selectOption(option)
-                        connectionManager.sendMacroSelect(optionNumber: number)
+                    // Show permission options as regular numbered buttons
+                    ForEach(permission.options) { option in
+                        PermissionButton(option: option) {
+                            macroManager.selectPermissionOption(option)
+                        }
                     }
-                }
+                } else {
+                    // Accept Suggestion button (Right Arrow + Enter for CLI autocomplete)
+                    // Always shown as the first option
+                    AcceptSuggestionButton(connectionManager: connectionManager)
 
-                // "Other" button - shown when there are options, sends next number to focus text input
-                if !macroManager.options.isEmpty {
-                    OtherButton(
-                        nextNumber: macroManager.options.count + 1,
-                        connectionManager: connectionManager,
-                        macroManager: macroManager
-                    )
+                    // Claude's numbered options (when available)
+                    ForEach(macroManager.options) { option in
+                        MacroButton(option: option) {
+                            let number = macroManager.selectOption(option)
+                            connectionManager.sendMacroSelect(optionNumber: number)
+                        }
+                    }
+
+                    // "Other" button - shown when there are options, sends next number to focus text input
+                    if !macroManager.options.isEmpty {
+                        OtherButton(
+                            nextNumber: macroManager.options.count + 1,
+                            connectionManager: connectionManager,
+                            macroManager: macroManager
+                        )
+                    }
                 }
             }
             .padding(.horizontal, 12)
@@ -43,6 +57,85 @@ struct MacroBarView: View {
         )
     }
 }
+
+/// Label showing the tool requesting permission
+struct PermissionLabel: View {
+    let tool: String
+
+    var body: some View {
+        HStack(spacing: 4) {
+            Image(systemName: "lock.shield")
+                .font(.system(size: 12, weight: .semibold))
+            Text(tool)
+                .font(.system(size: 12, weight: .semibold))
+        }
+        .foregroundColor(.orange)
+        .padding(.horizontal, 8)
+        .padding(.vertical, 6)
+        .background(
+            RoundedRectangle(cornerRadius: 6)
+                .fill(Color.orange.opacity(0.2))
+        )
+    }
+}
+
+/// Permission option button - styled like macro buttons
+struct PermissionButton: View {
+    let option: PermissionOption
+    let action: () -> Void
+
+    @State private var isPressed = false
+
+    // Color based on decision type
+    private var buttonColor: Color {
+        if option.decision.contains("deny") {
+            return Color.red.opacity(0.7)
+        } else if option.decision.contains("always") || option.decision.contains("session") {
+            return Color.green.opacity(0.7)
+        } else {
+            return Color.blue.opacity(0.7)
+        }
+    }
+
+    var body: some View {
+        Button(action: action) {
+            HStack(spacing: 6) {
+                // Number badge
+                Text("\(option.number)")
+                    .font(.system(size: 14, weight: .bold, design: .rounded))
+                    .foregroundColor(.black)
+                    .frame(width: 22, height: 22)
+                    .background(Circle().fill(Color.white))
+
+                // Option text
+                Text(truncatedText)
+                    .font(.system(size: 13, weight: .medium))
+                    .foregroundColor(.white)
+                    .lineLimit(1)
+            }
+            .padding(.horizontal, 12)
+            .padding(.vertical, 8)
+            .background(
+                RoundedRectangle(cornerRadius: 8)
+                    .fill(isPressed ? buttonColor.opacity(1.0) : buttonColor)
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 8)
+                    .stroke(Color.white.opacity(0.2), lineWidth: 1)
+            )
+        }
+        .buttonStyle(MacroButtonStyle(isPressed: $isPressed))
+    }
+
+    private var truncatedText: String {
+        let maxLength = 30
+        if option.text.count > maxLength {
+            return String(option.text.prefix(maxLength - 1)) + "…"
+        }
+        return option.text
+    }
+}
+
 
 /// Accept Suggestion button - sends Right Arrow + Enter for CLI autocomplete
 struct AcceptSuggestionButton: View {

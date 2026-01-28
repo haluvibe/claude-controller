@@ -83,6 +83,16 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             return (connected: cm.isConnected, deviceName: cm.connectedDeviceName)
         }
 
+        // Permission requests - forward to iPad
+        mcpBridgeServer?.onPermissionRequest = { [weak self] requestId, tool, details, options in
+            self?.connectionManager?.sendPermissionRequest(requestId: requestId, tool: tool, details: details, options: options)
+        }
+
+        // Permission responses - resolve pending HTTP request
+        connectionManager?.onPermissionResponse = { [weak self] requestId, decision in
+            self?.mcpBridgeServer?.resolvePermission(requestId: requestId, decision: decision)
+        }
+
         mcpBridgeServer?.start()
     }
 
