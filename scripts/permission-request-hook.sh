@@ -61,9 +61,48 @@ case "$DECISION" in
     echo '{"hookSpecificOutput":{"hookEventName":"PermissionRequest","decision":{"behavior":"allow"}}}'
     ;;
   "allowAlways")
-    # For "allow always", we return allow and Claude Code should remember this
-    # Note: The hook can't directly modify settings, but we can signal this intent
+    # Return allow to Claude Code immediately
     echo '{"hookSpecificOutput":{"hookEventName":"PermissionRequest","decision":{"behavior":"allow"}}}'
+
+    # Build permission pattern based on tool type
+    case "$TOOL_NAME" in
+      "Bash")
+        # Extract the command name (first word, basename only)
+        COMMAND=$(echo "$TOOL_INPUT" | jq -r '.tool_input.command // ""' | awk '{print $1}' | xargs basename 2>/dev/null)
+        if [ -n "$COMMAND" ]; then
+          PATTERN="Bash($COMMAND:*)"
+        else
+          PATTERN="Bash"
+        fi
+        ;;
+      "Write"|"Edit"|"NotebookEdit")
+        # For file operations, just allow the tool type
+        PATTERN="$TOOL_NAME"
+        ;;
+      *)
+        # Default: allow the tool by name
+        PATTERN="$TOOL_NAME"
+        ;;
+    esac
+
+    # Persist to project-local settings file
+    SETTINGS_DIR=".claude"
+    SETTINGS_FILE="$SETTINGS_DIR/settings.local.json"
+
+    # Create .claude directory if needed
+    mkdir -p "$SETTINGS_DIR" 2>/dev/null
+
+    # Create settings file if it doesn't exist
+    if [ ! -f "$SETTINGS_FILE" ]; then
+      echo '{"permissions":{"allow":[]}}' > "$SETTINGS_FILE"
+    fi
+
+    # Add pattern to permissions.allow array (avoid duplicates)
+    if [ -n "$PATTERN" ]; then
+      jq --arg pattern "$PATTERN" '
+        .permissions.allow = ((.permissions.allow // []) + [$pattern] | unique)
+      ' "$SETTINGS_FILE" > "$SETTINGS_FILE.tmp" 2>/dev/null && mv "$SETTINGS_FILE.tmp" "$SETTINGS_FILE"
+    fi
     ;;
   *)
     REASON=$(echo "$RESPONSE" | jq -r '.reason // "Denied via iPad"')
