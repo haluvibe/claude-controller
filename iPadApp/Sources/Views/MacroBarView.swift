@@ -23,6 +23,15 @@ struct MacroBarView: View {
                         connectionManager.sendMacroSelect(optionNumber: number)
                     }
                 }
+
+                // "Other" button - shown when there are options, sends next number to focus text input
+                if !macroManager.options.isEmpty {
+                    OtherButton(
+                        nextNumber: macroManager.options.count + 1,
+                        connectionManager: connectionManager,
+                        macroManager: macroManager
+                    )
+                }
             }
             .padding(.horizontal, 12)
             .padding(.vertical, 8)
@@ -53,7 +62,7 @@ struct AcceptSuggestionButton: View {
                     .font(.system(size: 14, weight: .bold))
                     .foregroundColor(.white)
 
-                Text("Accept")
+                Text("Accept Suggestion")
                     .font(.system(size: 13, weight: .medium))
                     .foregroundColor(.white)
             }
@@ -66,6 +75,44 @@ struct AcceptSuggestionButton: View {
             .overlay(
                 RoundedRectangle(cornerRadius: 8)
                     .stroke(Color.green.opacity(0.3), lineWidth: 1)
+            )
+        }
+        .buttonStyle(MacroButtonStyle(isPressed: $isPressed))
+    }
+}
+
+/// "Other" button - sends the next number WITHOUT Enter to allow custom text entry
+struct OtherButton: View {
+    let nextNumber: Int
+    let connectionManager: ConnectionManager
+    let macroManager: MacroManager
+    @State private var isPressed = false
+
+    var body: some View {
+        Button(action: {
+            // Send the next number WITHOUT Enter - user will type custom response then press Enter
+            connectionManager.sendMacroSelectWithoutEnter(optionNumber: nextNumber)
+            // Clear options so user can type their custom text
+            macroManager.clearOptions()
+        }) {
+            HStack(spacing: 6) {
+                Image(systemName: "text.cursor")
+                    .font(.system(size: 14, weight: .medium))
+                    .foregroundColor(.white)
+
+                Text("Other")
+                    .font(.system(size: 13, weight: .medium))
+                    .foregroundColor(.white)
+            }
+            .padding(.horizontal, 12)
+            .padding(.vertical, 8)
+            .background(
+                RoundedRectangle(cornerRadius: 8)
+                    .fill(isPressed ? Color.orange.opacity(0.9) : Color.orange.opacity(0.7))
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 8)
+                    .stroke(Color.orange.opacity(0.3), lineWidth: 1)
             )
         }
         .buttonStyle(MacroButtonStyle(isPressed: $isPressed))

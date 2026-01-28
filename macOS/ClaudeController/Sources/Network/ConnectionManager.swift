@@ -34,6 +34,7 @@ struct ControlMessage: Codable, Sendable {
     }
 
     var optionNumber: Int?
+    var includeEnter: Bool?  // For macroSelect: whether to press Enter after number
 
     var swipeDirection: String?
 }
@@ -332,13 +333,16 @@ final class ConnectionManager: ObservableObject {
             }
 
         case .macroSelect:
-            // Macro keyboard: type the selected option number + Enter
+            // Macro keyboard: type the selected option number, optionally press Enter
             if let number = message.optionNumber {
-                print("🔘 Macro selection: typing \(number) + Enter")
+                let shouldPressEnter = message.includeEnter ?? true  // Default to true for backwards compatibility
+                print("🔘 Macro selection: typing \(number)\(shouldPressEnter ? " + Enter" : " (no Enter)")")
                 injector.typeText("\(number)")
-                // Small delay then press Enter
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
-                    injector.keyPress(keyCode: 36, modifiers: 0) // Return key
+                // Only press Enter if includeEnter is true (or not specified)
+                if shouldPressEnter {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
+                        injector.keyPress(keyCode: 36, modifiers: 0) // Return key
+                    }
                 }
             }
         }

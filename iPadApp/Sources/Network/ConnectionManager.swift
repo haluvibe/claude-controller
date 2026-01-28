@@ -446,8 +446,18 @@ class ConnectionManager: ObservableObject {
     func sendMacroSelect(optionNumber: Int) {
         var message = ControlMessage(type: .macroSelect)
         message.optionNumber = optionNumber
+        message.includeEnter = true
         queueMessage(message)
         print("[ConnectionManager] Sent macro selection: \(optionNumber)")
+    }
+
+    /// Send macro selection without Enter (for "Other" button - allows custom text entry)
+    func sendMacroSelectWithoutEnter(optionNumber: Int) {
+        var message = ControlMessage(type: .macroSelect)
+        message.optionNumber = optionNumber
+        message.includeEnter = false
+        queueMessage(message)
+        print("[ConnectionManager] Sent macro selection (no Enter): \(optionNumber)")
     }
 }
 
@@ -461,6 +471,7 @@ struct ControlMessage: Codable {
     var modifiers: UInt32?
     var text: String?
     var optionNumber: Int?
+    var includeEnter: Bool?  // For macroSelect: whether to press Enter after number
 
     enum MessageType: String, Codable {
         case mouseMove
