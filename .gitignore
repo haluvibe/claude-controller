@@ -43,3 +43,7 @@ Secrets.plist
 *.provisionprofile
 *.p12
 *.cer
+
+# Personal data / session state - do not commit
+SESSION_CONTEXT.md
+.claude/skills/*/MEMORY.md

@@ -33,8 +33,14 @@ export class ProtonClient implements EmailSender {
   constructor(config: ProtonConfig) {
     this.config = config;
 
-    // Bridge uses STARTTLS (not implicit TLS), so secure must be false
-    // to allow the connection to upgrade via STARTTLS command.
+    // Proton Bridge runs on localhost and uses a self-signed TLS certificate.
+    // We disable certificate verification (rejectUnauthorized: false) because:
+    //   1. Bridge only listens on 127.0.0.1 — traffic never leaves the machine.
+    //   2. Bridge uses STARTTLS (not implicit TLS), so `secure` must be false
+    //      to allow the connection to upgrade via the STARTTLS command.
+    //   3. The self-signed cert would fail Node's default CA verification.
+    // This is safe ONLY for localhost Bridge connections. Do NOT use this
+    // setting for remote IMAP/SMTP servers.
     this.imap = new ImapFlow({
       host: config.imap.host,
       port: config.imap.port,

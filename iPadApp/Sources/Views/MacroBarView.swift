@@ -25,8 +25,12 @@ struct MacroBarView: View {
                         }
                     }
                 } else {
+                    // Utility buttons - always available
+                    EscapeButton(connectionManager: connectionManager)
+                    CopyButton(connectionManager: connectionManager)
+                    PasteButton(connectionManager: connectionManager)
+
                     // Accept Suggestion button (Right Arrow + Enter for CLI autocomplete)
-                    // Always shown as the first option
                     AcceptSuggestionButton(connectionManager: connectionManager)
 
                     // Claude's numbered options (when available)
@@ -136,6 +140,105 @@ struct PermissionButton: View {
     }
 }
 
+
+/// Escape button - sends Escape key (keyCode 53)
+struct EscapeButton: View {
+    let connectionManager: ConnectionManager
+    @State private var isPressed = false
+
+    var body: some View {
+        Button(action: {
+            connectionManager.sendKeyPress(keyCode: 53, modifiers: 0)
+        }) {
+            HStack(spacing: 6) {
+                Image(systemName: "escape")
+                    .font(.system(size: 14, weight: .bold))
+                    .foregroundColor(.white)
+
+                Text("Esc")
+                    .font(.system(size: 13, weight: .medium))
+                    .foregroundColor(.white)
+            }
+            .padding(.horizontal, 12)
+            .padding(.vertical, 8)
+            .background(
+                RoundedRectangle(cornerRadius: 8)
+                    .fill(isPressed ? Color.gray.opacity(0.9) : Color.gray.opacity(0.5))
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 8)
+                    .stroke(Color.gray.opacity(0.3), lineWidth: 1)
+            )
+        }
+        .buttonStyle(MacroButtonStyle(isPressed: $isPressed))
+    }
+}
+
+/// Copy button - sends Cmd+C (keyCode 8 + Command modifier)
+struct CopyButton: View {
+    let connectionManager: ConnectionManager
+    @State private var isPressed = false
+
+    var body: some View {
+        Button(action: {
+            connectionManager.sendKeyPress(keyCode: 8, modifiers: 0x100000)
+        }) {
+            HStack(spacing: 6) {
+                Image(systemName: "doc.on.doc")
+                    .font(.system(size: 14, weight: .bold))
+                    .foregroundColor(.white)
+
+                Text("Copy")
+                    .font(.system(size: 13, weight: .medium))
+                    .foregroundColor(.white)
+            }
+            .padding(.horizontal, 12)
+            .padding(.vertical, 8)
+            .background(
+                RoundedRectangle(cornerRadius: 8)
+                    .fill(isPressed ? Color.gray.opacity(0.9) : Color.gray.opacity(0.5))
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 8)
+                    .stroke(Color.gray.opacity(0.3), lineWidth: 1)
+            )
+        }
+        .buttonStyle(MacroButtonStyle(isPressed: $isPressed))
+    }
+}
+
+/// Paste button - sends Cmd+V (keyCode 9 + Command modifier)
+struct PasteButton: View {
+    let connectionManager: ConnectionManager
+    @State private var isPressed = false
+
+    var body: some View {
+        Button(action: {
+            connectionManager.sendKeyPress(keyCode: 9, modifiers: 0x100000)
+        }) {
+            HStack(spacing: 6) {
+                Image(systemName: "doc.on.clipboard")
+                    .font(.system(size: 14, weight: .bold))
+                    .foregroundColor(.white)
+
+                Text("Paste")
+                    .font(.system(size: 13, weight: .medium))
+                    .foregroundColor(.white)
+            }
+            .padding(.horizontal, 12)
+            .padding(.vertical, 8)
+            .background(
+                RoundedRectangle(cornerRadius: 8)
+                    .fill(isPressed ? Color.gray.opacity(0.9) : Color.gray.opacity(0.5))
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 8)
+                    .stroke(Color.gray.opacity(0.3), lineWidth: 1)
+            )
+        }
+        .buttonStyle(MacroButtonStyle(isPressed: $isPressed))
+    }
+}
 
 /// Accept Suggestion button - sends Right Arrow + Enter for CLI autocomplete
 struct AcceptSuggestionButton: View {

@@ -9,7 +9,7 @@ TOOL_INPUT=$(cat)
 # Create a lockfile so other hooks (stop, user-prompt) don't clear the iPad UI
 # while we're waiting for a permission response
 LOCK_DIR="/tmp/claude-controller"
-mkdir -p "$LOCK_DIR" 2>/dev/null
+mkdir -p "$LOCK_DIR" 2>/dev/null && chmod 700 "$LOCK_DIR" 2>/dev/null
 LOCK_FILE="$LOCK_DIR/permission-pending"
 echo $$ > "$LOCK_FILE"
 cleanup() { rm -f "$LOCK_FILE"; }

@@ -1,6 +1,10 @@
 #!/bin/bash
+set -euo pipefail
 # Hook script to clear iPad options after AskUserQuestion completes
 # Called by Claude Code's PostToolUse hook for AskUserQuestion
+
+# Ensure lockfile directory has restricted permissions
+mkdir -p /tmp/claude-controller 2>/dev/null && chmod 700 /tmp/claude-controller 2>/dev/null
 
 # Check if a permission request is pending - don't clear the iPad UI if so
 LOCK_FILE="/tmp/claude-controller/permission-pending"

@@ -1,4 +1,5 @@
 #!/bin/bash
+set -euo pipefail
 # Hook script to send AskUserQuestion options to iPad
 # Called by Claude Code's PreToolUse hook for AskUserQuestion
 

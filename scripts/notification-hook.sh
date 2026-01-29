@@ -1,4 +1,5 @@
 #!/bin/bash
+set -euo pipefail
 # Hook script for Claude Code Notification events
 # Sends notifications to iPad for user attention
 # Handles: idle_prompt, elicitation_dialog, and other notification types

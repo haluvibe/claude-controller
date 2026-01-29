@@ -5,6 +5,9 @@
 # Read input from stdin (Claude Code passes JSON)
 INPUT=$(cat)
 
+# Ensure lockfile directory has restricted permissions
+mkdir -p /tmp/claude-controller 2>/dev/null && chmod 700 /tmp/claude-controller 2>/dev/null
+
 # Check if a permission request is pending - don't clear the iPad UI if so
 LOCK_FILE="/tmp/claude-controller/permission-pending"
 if [ -f "$LOCK_FILE" ]; then
