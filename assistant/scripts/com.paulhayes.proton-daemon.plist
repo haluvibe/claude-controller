@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <!-- Label must match the filename (without .plist) -->
+    <key>Label</key>
+    <string>com.paulhayes.proton-daemon</string>
+
+    <!-- Program to execute -->
+    <key>ProgramArguments</key>
+    <array>
+        <string>/Users/paulhayes/.nvm/versions/node/v24.13.0/bin/node</string>
+        <string>/Users/paulhayes/automations/claude-controller/assistant/dist/proton-daemon.js</string>
+    </array>
+
+    <!-- Working directory -->
+    <key>WorkingDirectory</key>
+    <string>/Users/paulhayes/automations/claude-controller/assistant</string>
+
+    <!-- Start on login -->
+    <key>RunAtLoad</key>
+    <true/>
+
+    <!-- Restart on failure -->
+    <key>KeepAlive</key>
+    <dict>
+        <key>SuccessfulExit</key>
+        <false/>
+    </dict>
+
+    <!-- Throttle restarts (wait 30 seconds between restart attempts) -->
+    <key>ThrottleInterval</key>
+    <integer>30</integer>
+
+    <!-- Standard output log -->
+    <key>StandardOutPath</key>
+    <string>/Users/paulhayes/Library/Logs/proton-daemon/stdout.log</string>
+
+    <!-- Standard error log -->
+    <key>StandardErrorPath</key>
+    <string>/Users/paulhayes/Library/Logs/proton-daemon/stderr.log</string>
+
+    <!-- Environment variables -->
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>PATH</key>
+        <string>/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
+        <key>NODE_ENV</key>
+        <string>production</string>
+    </dict>
+
+    <!-- Process type - interactive allows access to user keychain -->
+    <key>ProcessType</key>
+    <string>Interactive</string>
+
+    <!-- Nice value (lower priority to not impact system performance) -->
+    <key>Nice</key>
+    <integer>10</integer>
+
+    <!-- Limit open files -->
+    <key>SoftResourceLimits</key>
+    <dict>
+        <key>NumberOfFiles</key>
+        <integer>256</integer>
+    </dict>
+</dict>
+</plist>

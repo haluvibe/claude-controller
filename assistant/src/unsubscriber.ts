@@ -4,8 +4,7 @@
  * Handles the unsubscribe process for marketing emails
  */
 
-import { Email, GmailClient } from './gmail-client.js';
-import { BrowserUnsubscriber } from './browser-unsubscriber.js';
+import { Email, EmailSender } from './email-types.js';
 
 export interface UnsubscribeResult {
   success: boolean;
@@ -263,31 +262,32 @@ function analyzeUnsubscribeResponse(body: string): {
 }
 
 export class Unsubscriber {
-  private browserUnsubscriber: BrowserUnsubscriber | null = null;
+  private browserUnsubscribeHandler: ((url: string) => Promise<UnsubscribeResult>) | null = null;
 
   /**
-   * Set the browser unsubscriber instance (for shared lifecycle management)
+   * Set an optional browser-based unsubscribe handler.
+   * This allows different clients (Gmail/Proton) to plug in their own browser automation.
    */
-  setBrowserUnsubscriber(browserUnsubscriber: BrowserUnsubscriber): void {
-    this.browserUnsubscriber = browserUnsubscriber;
+  setBrowserUnsubscribeHandler(handler: (url: string) => Promise<UnsubscribeResult>): void {
+    this.browserUnsubscribeHandler = handler;
   }
 
   /**
    * Try browser-based unsubscribe for complex pages
    */
   async tryBrowserUnsubscribe(url: string): Promise<UnsubscribeResult> {
-    if (!this.browserUnsubscriber) {
-      return { success: false, error: 'Browser unsubscriber not initialized' };
+    if (!this.browserUnsubscribeHandler) {
+      return { success: false, error: 'Browser unsubscriber not configured' };
     }
 
-    return await this.browserUnsubscriber.unsubscribeViaPage(url);
+    return await this.browserUnsubscribeHandler(url);
   }
 
   /**
    * Attempt to unsubscribe from an email
    * Uses List-Unsubscribe header if available
    */
-  async unsubscribe(email: Email, client: GmailClient): Promise<UnsubscribeResult> {
+  async unsubscribe(email: Email, sender: EmailSender): Promise<UnsubscribeResult> {
     // Try one-click unsubscribe first (RFC 8058)
     if (email.listUnsubscribePost && email.listUnsubscribe) {
       const oneClickResult = await this.tryOneClick(email);
@@ -298,7 +298,7 @@ export class Unsubscriber {
 
     // Try List-Unsubscribe header
     if (email.listUnsubscribe) {
-      return await this.tryListUnsubscribe(email, client);
+      return await this.tryListUnsubscribe(email, sender);
     }
 
     return { success: false, method: 'none', error: 'No unsubscribe mechanism found' };
@@ -348,7 +348,7 @@ export class Unsubscriber {
   /**
    * Try standard List-Unsubscribe (mailto or http)
    */
-  private async tryListUnsubscribe(email: Email, client: GmailClient): Promise<UnsubscribeResult> {
+  private async tryListUnsubscribe(email: Email, sender: EmailSender): Promise<UnsubscribeResult> {
     const urls = this.parseListUnsubscribe(email.listUnsubscribe!);
 
     // Try HTTPS first
@@ -430,7 +430,7 @@ export class Unsubscriber {
           return { success: false, error: rateCheck.reason };
         }
 
-        await client.sendEmail(
+        await sender.sendEmail(
           to,
           subject || 'Unsubscribe',
           body || 'Please unsubscribe me from this mailing list.'

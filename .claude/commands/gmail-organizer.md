@@ -5,7 +5,7 @@ allowed-tools: mcp__gmail__gmail_search_messages, mcp__gmail__gmail_read_message
 
 # Gmail Organizer
 
-Scan unread emails, classify marketing vs. important, and handle unsubscribes using Gmail MCP tools. After successful unsubscribe, mark emails as read and trash them via Chrome.
+Scan unread emails, classify into 4 tiers (important / low-priority / marketing / auto-trash), and clean up via Chrome. Important emails stay unread. Everything else gets handled automatically.
 
 ## Memory
 
@@ -17,14 +17,18 @@ After processing, update that file with any new decisions.
 ## Step 1: Search Unread Emails
 
 ```
-mcp__gmail__gmail_search_messages({ q: "is:unread", maxResults: 30 })
+mcp__gmail__gmail_search_messages({ q: "is:unread", maxResults: 100 })
 ```
 
-Process most recent first. Record the `id` of every email classified as marketing — you will need these IDs in Step 4b.
+If there are more results (nextPageToken returned), fetch additional pages until all unread emails are retrieved or 200 emails are reached.
+
+**CRITICAL: Process emails in order from MOST RECENT to LEAST RECENT (newest first).** Gmail returns results newest-first by default — preserve that order throughout ALL steps. Never reorder, shuffle, or batch by category before processing. Read, classify, report, unsubscribe, and trash in strict newest-first order.
+
+Record the `id` of every email classified as marketing, auto-trash, or low-priority — you will need these IDs in Step 4b/4c.
 
 ## Step 2: Classify Each Email
 
-Read each email with `mcp__gmail__gmail_read_message` and classify it.
+Read each email with `mcp__gmail__gmail_read_message` **in order from most recent to least recent** and classify it.
 
 ### Marketing Indicators (score-based, unsubscribe if score >= 4)
 
@@ -64,25 +68,56 @@ Read each email with `mcp__gmail__gmail_read_message` and classify it.
 - Support tickets, case numbers
 - Emails that are part of a conversation thread (have In-Reply-To or References headers)
 
+### Auto-Trash (skip reading, just delete)
+
+Some emails should be trashed immediately without reading or reporting. Classify these as **"auto-trash"** — they skip Steps 2–4a entirely and go straight to Step 4b (mark read + trash). Do NOT spend time reading their content.
+
+- **Google Cloud Alerting** (`alerting-noreply@google.com`) — Firebase billing/usage alerts
+- **Firebase** (`firebase-noreply@google.com`) — Crash reports and issue notifications
+
+### Low Priority (mark read + archive)
+
+Emails that are legitimate but don't need the user's attention. These get marked as read and archived (removed from inbox but not deleted).
+
+**Classify as low-priority if the email is:**
+- Account/service notifications (ToS updates, privacy policy changes, feature announcements)
+- Workspace/team notices (Slack content deletion, workspace updates)
+- Developer platform alerts (API deprecation notices, SDK updates, version upgrades)
+- Financial account notices (privacy updates, policy changes — NOT transactions or security)
+- Social/professional network notifications (LinkedIn connection updates, endorsements)
+- App update announcements from services you use
+- Non-actionable informational emails from known services
+
+**Low-priority senders (from Memory):**
+- Check MEMORY.md "Auto-Read + Archive" list
+
+**Key distinction:** If the email requires user action (password expiring, payment due, security alert), it is NOT low-priority — classify as "keep".
+
 ### Memory Override
 
 Check MEMORY.md first:
 - If sender is in "Always Unsubscribe" list: auto-classify as marketing
-- If sender is in "Never Unsubscribe" or "Trusted Senders" list: skip
+- If sender is in "Auto-Trash" list: classify as auto-trash (skip reading, just trash)
+- If sender is in "Auto-Read + Archive" list: classify as low-priority
+- If sender is in "Never Unsubscribe" or "Trusted Senders" list: classify as keep (leave unread)
 - If sender is in "Needs Review": ask user
 
 ## Step 3: Report Findings
 
-Present a summary table:
+Present a summary table **in newest-first order** (the same order you read them — do NOT re-sort by classification):
 
 ```
-| # | From | Subject | Classification | Confidence | Action |
+| # | Date | From | Subject | Classification | Action |
 ```
 
-Group by:
-1. Marketing (high confidence) - will unsubscribe
-2. Marketing (uncertain) - ask user
-3. Important/kept - no action
+Classifications: **keep** (leave unread), **low-priority** (read+archive), **marketing** (unsubscribe+trash), **auto-trash** (skip+trash)
+
+Include the date column so the user can verify the order is correct (most recent at the top).
+
+For large batches (50+), present a condensed summary instead of listing every email:
+- Count by classification
+- List only "keep" emails (so user can verify nothing important was missed)
+- List any new/unknown senders that need a decision
 
 ## Step 4a: Unsubscribe (with user approval)
 
@@ -101,11 +136,11 @@ For confirmed marketing emails, attempt unsubscribe using **List-Unsubscribe hea
 - Max 10 unsubscribes per run
 - When uncertain, ask the user
 
-## Step 4b: Mark as Read and Trash via Claude in Chrome
+## Step 4b: Trash via Chrome (marketing + auto-trash)
 
-**IMPORTANT: You MUST use Claude in Chrome (`mcp__claude-in-chrome__*` tools) for this step. There is no other way to modify emails — the Gmail MCP is read-only. Do not skip this step.**
+**IMPORTANT: You MUST use Claude in Chrome (`mcp__claude-in-chrome__*` tools) for this step. The Gmail MCP is read-only. Do not skip this step.**
 
-For every email where unsubscribe was attempted (confirmed or partial), use Claude in Chrome to open it in the Gmail web UI, mark it as read, and move it to the bin (trash).
+For every email classified as **marketing** or **auto-trash**: mark as read and trash.
 
 ### Procedure
 
@@ -114,30 +149,60 @@ For every email where unsubscribe was attempted (confirmed or partial), use Clau
    mcp__claude-in-chrome__tabs_context_mcp()
    ```
 
-2. **Open a tab for Gmail:**
+2. **Open a tab for Gmail** (or reuse existing):
    ```
    mcp__claude-in-chrome__tabs_create_mcp({ url: "https://mail.google.com" })
    ```
 
-3. **For each marketing email message ID**, navigate directly to it:
+3. **For each email message ID**, navigate directly to it:
    ```
    mcp__claude-in-chrome__navigate({ url: "https://mail.google.com/mail/u/0/#all/{messageId}" })
    ```
 
-4. **Wait for the email to load**, then use Gmail keyboard shortcuts:
+4. **Wait for the email to load** (wait 2 seconds), then:
    - **Mark as read:** press `Shift+i`
-   - **Trash (bin):** press `#`
+     ```
+     mcp__claude-in-chrome__computer({ action: "key", text: "shift+i" })
+     ```
+   - **Trash (bin):** click the trash icon in the Gmail toolbar (approximately x=421, y=88). Do NOT use the `#` keyboard shortcut — it does not work when Gmail keyboard shortcuts are disabled.
+     ```
+     mcp__claude-in-chrome__computer({ action: "left_click", coordinate: [421, 88] })
+     ```
+   - **Wait** 1.5 seconds for Gmail to navigate back to the list before proceeding to the next email.
+
+5. **Repeat** for every marketing and auto-trash email.
+
+## Step 4c: Read + Archive via Chrome (low-priority)
+
+For every email classified as **low-priority**: mark as read and archive (remove from inbox but keep in All Mail).
+
+### Procedure
+
+Use the same Gmail tab from Step 4b.
+
+1. **Navigate to the email:**
    ```
-   mcp__claude-in-chrome__computer({ action: "key", text: "shift+i" })
-   mcp__claude-in-chrome__computer({ action: "key", text: "#" })
+   mcp__claude-in-chrome__navigate({ url: "https://mail.google.com/mail/u/0/#all/{messageId}" })
    ```
 
-5. **Repeat** for every marketing email that was processed in Step 4a.
+2. **Wait for the email to load** (wait 2 seconds), then:
+   - **Mark as read:** press `Shift+i`
+     ```
+     mcp__claude-in-chrome__computer({ action: "key", text: "shift+i" })
+     ```
+   - **Archive:** click the archive icon in the Gmail toolbar (1st action icon, approximately x=301, y=88). If the position is wrong, take a screenshot to locate the archive button (box with down-arrow icon).
+     ```
+     mcp__claude-in-chrome__computer({ action: "left_click", coordinate: [301, 88] })
+     ```
+   - **Wait** 1.5 seconds for Gmail to navigate back to the list.
 
-### Rules
-- Only trash emails where unsubscribe was attempted (confirmed or partial)
-- Do NOT trash emails classified as "keep" or "uncertain"
-- If Chrome is not available or the browser tools fail, report which message IDs still need manual cleanup
+3. **Repeat** for every low-priority email.
+
+### Rules for Steps 4b and 4c
+- **Trash:** marketing + auto-trash emails
+- **Read + Archive:** low-priority emails
+- **Do NOT touch:** emails classified as "keep" — leave them unread in the inbox
+- If Chrome is not available or browser tools fail, report which message IDs still need manual cleanup
 
 ## Step 5: Update Memory
 
