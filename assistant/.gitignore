@@ -1,0 +1,16 @@
+# Dependencies
+node_modules/
+dist/
+
+# Sensitive credentials - NEVER commit these
+config/credentials.json
+config/token.json
+
+# Daemon state and logs
+config/daemon-state.json
+config/daemon.log
+
+# IDE
+.idea/
+*.swp
+.DS_Store

@@ -1,0 +1,57 @@
+{
+  "initialized": true,
+  "topology": "hierarchical",
+  "workers": [
+    "hive-worker-1769571779313-xami",
+    "research-scout-1769572111388-0j9q",
+    "research-scout-1769572111388-5wqk",
+    "research-scout-1769572111388-qad8",
+    "dev-worker-1769572111404-95pq",
+    "dev-worker-1769572111404-zars",
+    "dev-worker-1769572111404-tpdh",
+    "dev-worker-1769572111404-11ac",
+    "security-specialist-1769572111424-ab3t",
+    "security-specialist-1769572111424-or28",
+    "test-worker-1769572111442-qfm7",
+    "test-worker-1769572111442-mmq0",
+    "review-specialist-1769572111468-lo8d",
+    "review-specialist-1769572111468-7xu7",
+    "hive-worker-1769575025376-js7n"
+  ],
+  "consensus": {
+    "pending": [],
+    "history": []
+  },
+  "sharedMemory": {
+    "broadcasts": [
+      {
+        "messageId": "msg-1769572353329-qpcp4e",
+        "message": "QUEEN DIRECTIVE: Implementing all recommended security and code quality fixes for Gmail daemon. Assigning specialized workers to each category.",
+        "priority": "normal",
+        "fromId": "system",
+        "timestamp": "2026-01-28T03:52:33.329Z"
+      },
+      {
+        "messageId": "msg-1769572638123-awjv0t",
+        "message": "QUEEN DIRECTIVE: Deploy research scouts to investigate CLAWDBOT's Gmail integration architecture in detail. Priority mission.",
+        "priority": "normal",
+        "fromId": "system",
+        "timestamp": "2026-01-28T03:57:18.123Z"
+      },
+      {
+        "messageId": "msg-1769573281052-9spvx6",
+        "message": "QUEEN DIRECTIVE: Deploy research scout to investigate Moltbot skills/modules architecture. Priority mission - user considering adopting this modular pattern.",
+        "priority": "normal",
+        "fromId": "system",
+        "timestamp": "2026-01-28T04:08:01.052Z"
+      }
+    ]
+  },
+  "createdAt": "2026-01-28T03:48:22.186Z",
+  "updatedAt": "2026-01-28T04:37:05.376Z",
+  "queen": {
+    "agentId": "queen-coordinator",
+    "electedAt": "2026-01-28T03:48:22.186Z",
+    "term": 1
+  }
+}
