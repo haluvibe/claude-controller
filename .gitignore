@@ -47,3 +47,9 @@ Secrets.plist
 # Personal data / session state - do not commit
 SESSION_CONTEXT.md
 .claude/skills/*/MEMORY.md
+
+# Runtime databases and state files
+.claude/memory.db
+.swarm/memory.db
+**/.claude-flow/daemon-state.json
+**/.claude-flow/daemon.pid
