@@ -41,16 +41,7 @@ export class ProtonClient implements EmailSender {
     //   3. The self-signed cert would fail Node's default CA verification.
     // This is safe ONLY for localhost Bridge connections. Do NOT use this
     // setting for remote IMAP/SMTP servers.
-    this.imap = new ImapFlow({
-      host: config.imap.host,
-      port: config.imap.port,
-      secure: false,
-      auth: config.imap.auth,
-      tls: {
-        rejectUnauthorized: config.imap.tls?.rejectUnauthorized ?? false,
-      },
-      logger: false,
-    });
+    this.imap = this.createImapClient();
 
     this.smtp = createTransport({
       host: config.smtp.host,
@@ -61,6 +52,38 @@ export class ProtonClient implements EmailSender {
         rejectUnauthorized: config.smtp.tls?.rejectUnauthorized ?? false,
       },
     });
+  }
+
+  /**
+   * Create a fresh ImapFlow instance from config.
+   */
+  private createImapClient(): ImapFlow {
+    return new ImapFlow({
+      host: this.config.imap.host,
+      port: this.config.imap.port,
+      secure: false,
+      auth: this.config.imap.auth,
+      tls: {
+        rejectUnauthorized: this.config.imap.tls?.rejectUnauthorized ?? false,
+      },
+      logger: false,
+      // Keep socket alive during long IDLE periods. The default (5 min) kills
+      // idle connections before the server's own IDLE timeout (~29 min).
+      socketTimeout: 10 * 60 * 1000, // 10 minutes
+      // We manage IDLE ourselves in startIdle(); prevent ImapFlow from
+      // entering IDLE automatically which can conflict with our loop.
+      disableAutoIdle: true,
+    });
+  }
+
+  /**
+   * Recreate the IMAP connection with a fresh instance.
+   * Used when the existing connection is broken beyond recovery.
+   */
+  async reconnect(): Promise<void> {
+    try { await this.imap.logout(); } catch { /* already dead */ }
+    this.imap = this.createImapClient();
+    await this.imap.connect();
   }
 
   async connect(): Promise<void> {
@@ -205,34 +228,51 @@ export class ProtonClient implements EmailSender {
   /**
    * Start IMAP IDLE on a mailbox and call the handler on new mail.
    * Returns a function to stop idling.
+   *
+   * The loop acquires a mailbox lock for IDLE, releases it before
+   * calling onNewMail (so the handler can acquire its own locks),
+   * then re-acquires for the next IDLE cycle.  On connection failure
+   * the ImapFlow instance is fully recreated.
    */
   async startIdle(
     mailbox: string,
     onNewMail: () => Promise<void>,
   ): Promise<() => void> {
-    await this.imap.getMailboxLock(mailbox);
-
     let running = true;
+    let backoff = 10_000; // start at 10s, cap at 5 min
 
     const idleLoop = async () => {
       while (running) {
+        let lock;
         try {
+          lock = await this.imap.getMailboxLock(mailbox);
           // idle() resolves when the server sends an EXISTS update or the
           // idle timeout (29 min default) expires.
           await this.imap.idle();
+          lock.release();
+          lock = undefined;
+
           if (running) {
+            backoff = 10_000; // reset backoff on success
             await onNewMail();
           }
         } catch (err) {
+          if (lock) { try { lock.release(); } catch { /* ignore */ } }
+
           if (running) {
-            // Reconnect after a brief delay
-            console.error('[ProtonClient] IDLE error, reconnecting in 10s:', err);
-            await new Promise(r => setTimeout(r, 10_000));
+            console.error(`[ProtonClient] IDLE error, reconnecting in ${backoff / 1000}s:`, err);
+            await new Promise(r => setTimeout(r, backoff));
+            backoff = Math.min(backoff * 2, 300_000); // exponential up to 5 min
+
             try {
-              await this.imap.connect();
-              await this.imap.getMailboxLock(mailbox);
-            } catch {
-              // Will retry on next loop iteration
+              await this.reconnect();
+              console.log('[ProtonClient] Reconnected successfully');
+              // Process any mail that arrived while disconnected
+              await onNewMail();
+              backoff = 10_000; // reset on successful reconnect
+            } catch (reconnectErr) {
+              console.error('[ProtonClient] Reconnect failed:', reconnectErr);
+              // Will retry on next loop iteration with increased backoff
             }
           }
         }

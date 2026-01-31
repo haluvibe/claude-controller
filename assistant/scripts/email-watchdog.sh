@@ -226,6 +226,31 @@ check_review() {
     fi
 }
 
+# --- Pending Actions Backlog Check ---
+
+check_pending_actions() {
+    PENDING_FILE="$SCRIPT_DIR/../../.claude/skills/gmail-unsubscribe/pending-actions.json"
+    if [ -f "$PENDING_FILE" ]; then
+        # Check file age
+        LAST_MOD=$(stat -f%m "$PENDING_FILE" 2>/dev/null || echo 0)
+        NOW=$(date +%s)
+        AGE=$(( NOW - LAST_MOD ))
+        HOURS=$(( AGE / 3600 ))
+
+        # Count actions (rough count by counting "action" occurrences)
+        ACTION_COUNT=$(grep -c '"action"' "$PENDING_FILE" 2>/dev/null || echo 0)
+
+        if [ "$AGE" -gt 172800 ] || [ "$ACTION_COUNT" -gt 20 ]; then
+            log "PENDING: ${ACTION_COUNT} actions queued, file is ${HOURS}h old (threshold: 48h or >20 items)"
+            issues+=("Gmail pending actions backlog: ${ACTION_COUNT} items, ${HOURS}h old")
+        else
+            log "PENDING: OK (${ACTION_COUNT} actions, ${HOURS}h old)"
+        fi
+    else
+        log "PENDING: OK (no pending actions file)"
+    fi
+}
+
 # --- Run All Checks ---
 
 log "=== Watchdog check starting ==="
@@ -234,6 +259,7 @@ check_bridge
 check_proton
 check_gmail
 check_review
+check_pending_actions
 
 if [ ${#issues[@]} -eq 0 ]; then
     log "=== All systems healthy ==="
@@ -243,7 +269,7 @@ else
 
     if $NOTIFY; then
         # Send notification via iPad MCP if available
-        curl -s -X POST "http://localhost:3742/notify" \
+        curl -s -X POST "http://localhost:19847/notify" \
             -H "Content-Type: application/json" \
             -d "{\"message\": \"Watchdog: $SUMMARY\"}" \
             > /dev/null 2>&1 || true

@@ -6,11 +6,16 @@
  * (unsubscribe, move to folders, trash).
  */
 
+import { readFileSync } from 'fs';
+import { resolve, dirname } from 'path';
+import { fileURLToPath } from 'url';
 import { ProtonClient } from './proton-client.js';
 import { MarketingDetector, AnalysisResult } from './marketing-detector.js';
 import { NotificationDetector, NotificationResult } from './notification-detector.js';
 import { Unsubscriber, UnsubscribeResult } from './unsubscriber.js';
 import { Email } from './email-types.js';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
 export type Classification = 'marketing' | 'notification' | 'keep';
 
@@ -34,6 +39,16 @@ export interface ScanSummary {
   results: ScanResult[];
 }
 
+/**
+ * Sender preferences loaded from MEMORY.md.
+ * These override the hardcoded detectors.
+ */
+interface MemoryOverrides {
+  marketing: Set<string>;      // Always Unsubscribe senders (lowercase email/domain)
+  neverUnsubscribe: Set<string>; // Never Unsubscribe / important senders
+  notification: Set<string>;   // Always Move to Notifications senders
+}
+
 const NOTIFICATIONS_FOLDER = 'Folders/Notifications';
 
 export class ProtonScanner {
@@ -41,12 +56,107 @@ export class ProtonScanner {
   private marketingDetector: MarketingDetector;
   private notificationDetector: NotificationDetector;
   private unsubscriber: Unsubscriber;
+  private memoryOverrides: MemoryOverrides;
 
   constructor(client: ProtonClient) {
     this.client = client;
     this.marketingDetector = new MarketingDetector();
     this.notificationDetector = new NotificationDetector();
     this.unsubscriber = new Unsubscriber();
+    this.memoryOverrides = this.loadMemory();
+  }
+
+  /**
+   * Reload MEMORY.md from disk. Called on SIGHUP or manually.
+   */
+  reloadMemory(): void {
+    this.memoryOverrides = this.loadMemory();
+  }
+
+  /**
+   * Parse MEMORY.md and extract sender email addresses/domains
+   * into categorized sets for classification override.
+   */
+  private loadMemory(): MemoryOverrides {
+    const marketing = new Set<string>();
+    const neverUnsubscribe = new Set<string>();
+    const notification = new Set<string>();
+
+    // Try multiple possible locations for MEMORY.md
+    const memoryPaths = [
+      resolve(__dirname, '../../.claude/skills/proton-organizer/MEMORY.md'),
+      resolve(__dirname, '../../../.claude/skills/proton-organizer/MEMORY.md'),
+    ];
+
+    let content = '';
+    for (const p of memoryPaths) {
+      try {
+        content = readFileSync(p, 'utf-8');
+        break;
+      } catch {
+        // try next path
+      }
+    }
+
+    if (!content) {
+      console.log('[ProtonScanner] MEMORY.md not found, using hardcoded classifiers only');
+      return { marketing, neverUnsubscribe, notification };
+    }
+
+    // Extract email addresses from table rows in each section
+    let currentSection = '';
+    for (const line of content.split('\n')) {
+      const trimmed = line.trim();
+
+      // Detect section headers
+      if (trimmed.startsWith('### Always Unsubscribe')) {
+        currentSection = 'marketing';
+      } else if (trimmed.startsWith('### Never Unsubscribe')) {
+        currentSection = 'neverUnsubscribe';
+      } else if (trimmed.startsWith('### Always Move to Notifications')) {
+        currentSection = 'notification';
+      } else if (trimmed.startsWith('### ')) {
+        currentSection = ''; // other section, stop collecting
+      }
+
+      if (!currentSection) continue;
+
+      // Extract email addresses from table rows (format: | ... | domain | ...)
+      // Look for email-like patterns in the line
+      const emailMatches = trimmed.match(/[\w.+-]+@[\w.-]+\.\w+/g);
+      if (emailMatches) {
+        const targetSet = currentSection === 'marketing' ? marketing
+          : currentSection === 'neverUnsubscribe' ? neverUnsubscribe
+          : notification;
+        for (const email of emailMatches) {
+          targetSet.add(email.toLowerCase());
+        }
+      }
+    }
+
+    console.log(`[ProtonScanner] Loaded MEMORY.md: ${marketing.size} marketing, ${neverUnsubscribe.size} never-unsub, ${notification.size} notification senders`);
+    return { marketing, neverUnsubscribe, notification };
+  }
+
+  /**
+   * Check if a sender email matches any address in a set.
+   * Matches both exact email and domain-level.
+   */
+  private senderMatchesSet(fromField: string, senderSet: Set<string>): boolean {
+    const emailMatch = fromField.match(/[\w.+-]+@[\w.-]+\.\w+/);
+    if (!emailMatch) return false;
+    const email = emailMatch[0].toLowerCase();
+    // Check exact email match
+    if (senderSet.has(email)) return true;
+    // Check domain match (e.g., if set has "info@g2a.com", match "info@g2a.com")
+    // Also check if the domain portion matches any entry's domain
+    const domain = email.split('@')[1];
+    for (const entry of senderSet) {
+      if (entry.split('@')[1] === domain && entry.split('@')[0] === email.split('@')[0]) {
+        return true;
+      }
+    }
+    return false;
   }
 
   /**
@@ -58,6 +168,15 @@ export class ProtonScanner {
     const results: ScanResult[] = [];
 
     for (const email of emails) {
+      // MEMORY.md overrides take priority over hardcoded detectors
+      const memoryClassification = this.classifyByMemory(email);
+      if (memoryClassification) {
+        const dummyMarketing: AnalysisResult = { isMarketing: memoryClassification === 'marketing', confidence: 1, reasons: ['MEMORY.md override'] };
+        const dummyNotification: NotificationResult = { isNotification: memoryClassification === 'notification', confidence: 1, category: 'service', reasons: ['MEMORY.md override'] };
+        results.push({ email, classification: memoryClassification, marketingAnalysis: dummyMarketing, notificationAnalysis: dummyNotification });
+        continue;
+      }
+
       const marketingAnalysis = this.marketingDetector.analyze(email);
       const notificationAnalysis = this.notificationDetector.analyze(email);
 
@@ -87,6 +206,26 @@ export class ProtonScanner {
       archived: 0,
       results,
     };
+  }
+
+  /**
+   * Classify an email using MEMORY.md overrides.
+   * Returns null if no override applies (fall through to detectors).
+   */
+  private classifyByMemory(email: Email): Classification | null {
+    // Never-unsubscribe takes highest priority (protect important senders)
+    if (this.senderMatchesSet(email.from, this.memoryOverrides.neverUnsubscribe)) {
+      return 'keep';
+    }
+    // Marketing override
+    if (this.senderMatchesSet(email.from, this.memoryOverrides.marketing)) {
+      return 'marketing';
+    }
+    // Notification override
+    if (this.senderMatchesSet(email.from, this.memoryOverrides.notification)) {
+      return 'notification';
+    }
+    return null;
   }
 
   /**

@@ -4,6 +4,42 @@ Timestamped findings from automated email stack reviews.
 
 ---
 
+## Review — 2026-02-02 08:35 AEDT
+
+### Overall Grade: A-
+
+Both inboxes clean. Gmail 10/10 classification, 9/9 trash correct, 65-item backlog cleared. Proton inbox empty, daemon healthy. Deductions: Proton old batch had 2 misclassifications (now fixed), Westpac still goes to Notifications, system can't execute Gmail without manual Chrome.
+
+### Gmail (24 hours)
+
+- **Inbox:** 1 email — Westpac eStatement (legitimate, correctly kept)
+- **Trash:** 9 emails — 9/9 correctly trashed (Domaine Homes, Google Alerting x4, G2A, Luxury Escapes, National Zoo newsletter, Caluga Farm)
+- **Classification:** 10/10 correct
+- **Execution:** 10/10 (backlog cleared via Chrome)
+- **Pending:** 0 (cleared)
+- **Misclassifications:** None
+
+### Proton (24 hours)
+
+- **Inbox:** 0 — clean
+- **Daemon:** Restarted 23:05 UTC Jan 31 with MEMORY.md (63 marketing senders). Healthy IDLE.
+- **Last batch:** 10 emails — 7/10 correct. Westpac to Notifications (should be kept), G2A + Luxury Escapes archived as keep (old code, now fixed)
+
+### Improvement from C+ to A-
+
+- Gmail backlog: 65 -> 0
+- Gmail inbox: 10 -> 1
+- Gmail execution: 0% -> 100%
+- Proton daemon: now MEMORY.md-aware
+
+### Remaining Issues
+
+1. Proton Westpac -> Notifications (should be kept)
+2. Gmail Chrome dependency for execution
+3. Proton CLI can't audit Trash/Notifications folders
+
+---
+
 ## Review — 2026-02-01 22:30
 
 ### Overall Verdict: NEEDS ATTENTION
@@ -85,3 +121,96 @@ Two misclassifications found in Gmail trash. Gmail pending actions backlog growi
 5. **Add Westpac to Proton "Never Unsubscribe" list** — Bank eStatements should be kept/important, not moved to Notifications folder
 6. **Add Pollen cafe and Anaconda to Gmail "Always Unsubscribe"** — Both are marketing senders still sitting in the inbox
 7. **Consider reducing session frequency** — Sessions 12-16 all scan the same ~100 emails with near-identical results. Without Chrome, running sessions more than once per day wastes classification effort with no execution
+
+---
+
+## Backlog Clearance — 2026-02-02 08:30 AEDT
+
+### Actions Taken
+
+Chrome session opened. Cleared the entire 65-item pending-actions backlog via bulk Gmail operations.
+
+**Trash operation:**
+- Searched inbox for all 21 marketing sender domains (domainehomes, alerting-noreply@google, g2a, luxuryescapes, calugafarmstore, nationalzoo, open.edu.au, nab, glassdoor, acquire, ubs, republic, evie, jobs2web, uneed, bigideasdb, wise, fameswap, starterstory, weforum, bubble.io)
+- Selected all matching conversations, confirmed bulk trash
+- Result: ~20 emails trashed from inbox
+
+**Archive operation:**
+- Searched inbox for all 14 notification sender domains (developers.facebook, slack, wise, ubisoft, patreon, redditmail, email.apple, aussiebroadband, amplitude, render, discord, imagekit, location-sharing@google, feedback@slack)
+- Selected all matching conversations, confirmed bulk archive
+- Result: ~78 emails archived from inbox
+
+**Totals:**
+- Inbox: 1,083 -> 985 (98 emails cleared)
+- pending-actions.json: Deleted (backlog fully cleared)
+- Next Gmail organizer session starts fresh with no queued actions
+
+### Remaining Issue #4 from previous review (Chrome dependency) is now RESOLVED for this cycle. The organizer still needs Chrome for future runs.
+
+---
+
+## Review — 2026-02-01 10:10 AEDT
+
+### Overall Grade: C+
+
+Gmail classification is accurate but execution is completely stalled — 7 sessions, zero actions. Proton daemon is healthy and inbox is clean, but had 2 misclassifications (now fixed with MEMORY.md loading). 64-item Gmail pending backlog growing.
+
+### Gmail (24 hours)
+
+- **Inbox:** 10 emails — 7 are junk/marketing correctly identified but NOT actioned, 3 are legitimate (Westpac statement, National Zoo membership, Caluga farm)
+- **Trash:** 0 emails — nothing trashed in last 24h
+- **Sessions:** 2 runs (Sessions 15-16), both classify-only, Chrome not available
+- **Pending:** 64 actions queued (28 trash + 36 archive), file created 2026-02-01. 7 consecutive sessions without Chrome execution
+
+**Gmail inbox breakdown (last 24h):**
+
+| Sender | Classification | Pending Action | Correct? |
+|--------|---------------|----------------|----------|
+| Domaine Homes NSW (contact@domainehomes.com.au) | Marketing | Trash | Yes |
+| Google Cloud Alerting x4 (alerting-noreply@google.com) | Auto-trash | Trash | Yes |
+| G2A.COM (info@g2a.com) | Marketing | Trash | Yes |
+| Luxury Escapes (email@m.luxuryescapes.com) | Marketing | Trash | Yes |
+| Caluga Farm Store (info@calugafarmstore.com.au) | Marketing | Trash | Yes (Klaviyo newsletter) |
+| National Zoo & Aquarium (memberships@nationalzoo.com.au) | Keep | None | Yes (membership) |
+| Westpac Statement (tbstatementnotification@email7.westpac.com.au) | Keep Unread | None | Yes (banking) |
+
+Classification accuracy: 10/10 correct. Execution: 0/10 actioned. The brain works, the arms don't.
+
+### Proton (24 hours)
+
+- **Inbox:** 0 emails — clean
+- **Daemon:** 10 emails processed at 22:11 UTC Jan 31, then 0 on restart. Running healthy in IDLE mode
+- **Errors:** 0
+- **Trash/Notifications scan:** Returned 0 results (CLI `--mailbox` flag gap — cannot scan non-INBOX mailboxes)
+
+**Proton daemon last batch (Jan 31 22:11 UTC):**
+
+| Sender | Action | Correct? |
+|--------|--------|----------|
+| Domaine Homes NSW | Trashed | Yes |
+| National Zoo & Aquarium | Trashed | Yes |
+| Netflix | Trashed | Yes |
+| Google Cloud Alerting x4 | Moved to Notifications | Yes |
+| Westpac Statement | Moved to Notifications | Yes |
+| G2A.COM | Archived as "keep" | **NO** — marketing |
+| Luxury Escapes | Archived as "keep" | **NO** — marketing |
+
+8/10 correct. 2 misclassifications from old code that didn't read MEMORY.md.
+
+### Misclassifications Found
+
+1. **G2A.COM (info@g2a.com) — Proton: archived as keep instead of trashed.** Old daemon code didn't read MEMORY.md. Now fixed — daemon restarted with MEMORY.md loading (63 marketing senders).
+2. **Luxury Escapes (email@m.luxuryescapes.com) — Proton: archived as keep instead of trashed.** Same root cause. Fixed.
+
+### Fixes Applied
+
+1. **Proton daemon restarted** with new MEMORY.md-aware code. Now loads 63 marketing, 3 never-unsub, 20 notification sender overrides at startup
+2. **MEMORY.md cross-platform sync** completed in previous session — 7 Gmail marketing senders added to Proton, Westpac added to Proton never-unsub
+3. **SIGHUP reload** added to daemon — can reload MEMORY.md without restart
+4. **All 7 improvement items from DESIGN-GOAL.md** implemented (see previous session)
+
+### Remaining Issues
+
+1. **Gmail Chrome dependency is the #1 problem.** 7 sessions, 64 queued actions, zero execution. The organizer needs a Chrome session to clear the backlog. Until then, marketing emails accumulate in the inbox
+2. **Proton scan CLI can't read Trash/Notifications folders** — `--mailbox Trash` and `--mailbox "Folders/Notifications"` return 0 results. The scan CLI tool needs to support non-INBOX mailboxes for the review agent to audit the daemon's work
+3. **Gmail deduplication not yet tested** — classified-ids.json was added to the organizer prompt but hasn't run yet. Next session will be the first test

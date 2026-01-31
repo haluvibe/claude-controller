@@ -24,7 +24,22 @@ cd /Users/paulhayes/automations/claude-controller/assistant && node dist/proton-
 
 If connection fails, tell the user to start Proton Mail Bridge.
 
+## Session Log
+
+Before processing, read the session log for history of past runs:
+`.claude/skills/proton-organizer/SESSION-LOG.md`
+
+After processing, append a new entry to the session log with:
+- Session number and date/time
+- Number of emails scanned
+- Classifications breakdown (keep / notification / marketing)
+- All actions taken (unsubscribe attempts, trash, move, archive) with timestamps
+- Any errors encountered
+- Connection status
+
 ## Step 2: Scan Inbox
+
+**IMPORTANT: Only process emails from the last 24 hours. When fetching messages via IMAP, only retrieve messages with a SINCE date of 1 day ago. Never process emails older than 24 hours. If using the CLI scanner, pass `--since 1d` to limit the date range. If the scanner does not support a date flag, filter results after fetching to exclude anything older than 24 hours.**
 
 Fetch and classify unread emails (read-only, no side effects):
 

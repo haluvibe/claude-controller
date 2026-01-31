@@ -61,6 +61,13 @@ async function main(): Promise<void> {
     await processBatch(scanner);
   });
 
+  // SIGHUP: reload MEMORY.md without restarting
+  process.on('SIGHUP', () => {
+    log('Received SIGHUP, reloading MEMORY.md...');
+    scanner.reloadMemory();
+    log('MEMORY.md reloaded');
+  });
+
   // Graceful shutdown
   const shutdown = async (signal: string) => {
     log(`Received ${signal}, shutting down...`);

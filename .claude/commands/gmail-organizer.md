@@ -14,13 +14,52 @@ Before processing, read the memory file for learned preferences:
 
 After processing, update that file with any new decisions.
 
+## Step 0: Process Pending Actions
+
+Check if `.claude/skills/gmail-unsubscribe/pending-actions.json` exists. If it does AND Chrome tools (`mcp__claude-in-chrome__*`) are available:
+1. Read the file
+2. Execute each pending trash/archive action via Chrome (same procedure as Steps 4b/4c)
+3. Delete the file after all actions are processed
+4. Report how many pending actions were completed
+
+If Chrome tools are NOT available, skip this step (the queue will be processed on the next interactive run).
+
+## Session Log
+
+Before processing, read the session log for history of past runs:
+`.claude/skills/gmail-unsubscribe/SESSION-LOG.md`
+
+After processing, append a new entry to the session log with:
+- Session number and date/time
+- Number of emails scanned
+- Classifications breakdown (keep / low-priority / marketing / auto-trash)
+- All actions taken (unsubscribe attempts, trash, archive) with timestamps
+- Any errors encountered
+- Chrome availability status
+
 ## Step 1: Search Unread Emails
 
+**IMPORTANT: Only process emails from the last 24 hours. Use the Gmail search query `is:unread newer_than:1d` instead of just `is:unread`. Never process emails older than 24 hours.**
+
 ```
-mcp__gmail__gmail_search_messages({ q: "is:unread", maxResults: 100 })
+mcp__gmail__gmail_search_messages({ q: "is:unread newer_than:1d", maxResults: 100 })
 ```
 
 If there are more results (nextPageToken returned), fetch additional pages until all unread emails are retrieved or 200 emails are reached.
+
+### Deduplication
+
+After fetching, read `.claude/skills/gmail-unsubscribe/classified-ids.json` if it exists. This file tracks email IDs that have already been classified in previous sessions. **Skip any email whose ID is already in this file** — only classify genuinely new emails.
+
+After classification, update the file with all newly classified IDs:
+```json
+{
+  "lastUpdated": "<ISO timestamp>",
+  "ids": ["id1", "id2", ...]
+}
+```
+
+Cap the file at 500 IDs. If it exceeds 500, keep only the most recent 500. This prevents the organizer from wasting context re-classifying the same emails when Chrome is unavailable.
 
 **CRITICAL: Process emails in order from MOST RECENT to LEAST RECENT (newest first).** Gmail returns results newest-first by default — preserve that order throughout ALL steps. Never reorder, shuffle, or batch by category before processing. Read, classify, report, unsubscribe, and trash in strict newest-first order.
 
@@ -198,11 +237,29 @@ Use the same Gmail tab from Step 4b.
 
 3. **Repeat** for every low-priority email.
 
+### Fallback: Chrome Not Available (scheduled/headless runs)
+
+If Chrome tools (`mcp__claude-in-chrome__*`) are NOT available (e.g., running as a scheduled daemon via `claude -p`):
+
+1. Save all pending actions to `.claude/skills/gmail-unsubscribe/pending-actions.json`:
+   ```json
+   {
+     "created": "<ISO timestamp>",
+     "actions": [
+       {"id": "msg123", "action": "trash", "from": "spam@example.com", "subject": "..."},
+       {"id": "msg456", "action": "archive", "from": "newsletter@example.com", "subject": "..."}
+     ]
+   }
+   ```
+2. Report: "X actions queued for next interactive session (saved to pending-actions.json)"
+
+These queued actions will be processed automatically in Step 0 on the next interactive run.
+
 ### Rules for Steps 4b and 4c
 - **Trash:** marketing + auto-trash emails
 - **Read + Archive:** low-priority emails
 - **Do NOT touch:** emails classified as "keep" — leave them unread in the inbox
-- If Chrome is not available or browser tools fail, report which message IDs still need manual cleanup
+- If Chrome tools fail mid-execution, save remaining actions to `pending-actions.json` for the next run
 
 ## Step 5: Update Memory
 
