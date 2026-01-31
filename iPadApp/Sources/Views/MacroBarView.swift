@@ -26,12 +26,11 @@ struct MacroBarView: View {
                     }
                 } else {
                     // Utility buttons - always available
+                    AcceptSuggestionButton(connectionManager: connectionManager)
                     EscapeButton(connectionManager: connectionManager)
                     CopyButton(connectionManager: connectionManager)
                     PasteButton(connectionManager: connectionManager)
-
-                    // Accept Suggestion button (Right Arrow + Enter for CLI autocomplete)
-                    AcceptSuggestionButton(connectionManager: connectionManager)
+                    CommitPushButton(connectionManager: connectionManager)
 
                     // Claude's numbered options (when available)
                     ForEach(macroManager.options) { option in
@@ -271,6 +270,42 @@ struct AcceptSuggestionButton: View {
             .overlay(
                 RoundedRectangle(cornerRadius: 8)
                     .stroke(Color.green.opacity(0.3), lineWidth: 1)
+            )
+        }
+        .buttonStyle(MacroButtonStyle(isPressed: $isPressed))
+    }
+}
+
+/// Commit & Push button - types "add all changes, commit and push" + Enter
+struct CommitPushButton: View {
+    let connectionManager: ConnectionManager
+    @State private var isPressed = false
+
+    var body: some View {
+        Button(action: {
+            connectionManager.sendTextToType("add all changes, commit and push")
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                connectionManager.sendKeyPress(keyCode: 36, modifiers: 0)
+            }
+        }) {
+            HStack(spacing: 6) {
+                Image(systemName: "arrow.up.circle.fill")
+                    .font(.system(size: 14, weight: .bold))
+                    .foregroundColor(.white)
+
+                Text("Commit & Push")
+                    .font(.system(size: 13, weight: .medium))
+                    .foregroundColor(.white)
+            }
+            .padding(.horizontal, 12)
+            .padding(.vertical, 8)
+            .background(
+                RoundedRectangle(cornerRadius: 8)
+                    .fill(isPressed ? Color.purple.opacity(0.9) : Color.purple.opacity(0.7))
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 8)
+                    .stroke(Color.purple.opacity(0.3), lineWidth: 1)
             )
         }
         .buttonStyle(MacroButtonStyle(isPressed: $isPressed))
