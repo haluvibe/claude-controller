@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.paulhayes.email-review</string>
+    <key>ProgramArguments</key>
+    <array>
+        <string>/bin/bash</string>
+        <string>-c</string>
+        <string>export PATH="/usr/local/bin:/usr/bin:/bin:/opt/homebrew/bin:$HOME/.nvm/versions/node/v24.13.0/bin:$HOME/.local/bin:$PATH" &amp;&amp; cd "/Users/paulhayes/automations/claude-controller" &amp;&amp; claude -p "Run /email-review to review the health and effectiveness of the email automation stack. Analyze last 30 days of logs, produce a summary report, send iPad notification, and update the review log." --dangerously-skip-permissions</string>
+    </array>
+    <key>StartCalendarInterval</key>
+    <array>
+        <dict>
+            <key>Hour</key><integer>9</integer>
+            <key>Minute</key><integer>0</integer>
+        </dict>
+        <dict>
+            <key>Hour</key><integer>21</integer>
+            <key>Minute</key><integer>0</integer>
+        </dict>
+    </array>
+    <key>StandardOutPath</key>
+    <string>/Users/paulhayes/.claude/logs/email-review.log</string>
+    <key>StandardErrorPath</key>
+    <string>/Users/paulhayes/.claude/logs/email-review.error.log</string>
+    <key>RunAtLoad</key>
+    <false/>
+
+    <!-- Kill the process if it runs longer than 30 minutes -->
+    <key>TimeOut</key>
+    <integer>1800</integer>
+</dict>
+</plist>
