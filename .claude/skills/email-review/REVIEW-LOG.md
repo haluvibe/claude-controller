@@ -4,6 +4,173 @@ Timestamped findings from automated email stack reviews.
 
 ---
 
+## Review — 2026-02-03 00:30 AEDT
+
+### Overall Grade: A-
+
+Major improvement over previous reviews. The `--chrome` flag fix resolved the 13-session Chrome drought — Session 22 ran with Chrome and cleared all 5 pending actions. Gmail classification remains perfect. Proton daemon still idle >24h (only remaining issue). No misclassifications on either platform.
+
+### Gmail (24 hours)
+- Inbox: 3 emails — 0 missed junk, 3 legitimate (G2A transactional, McGrath real estate, Uplus real estate)
+- Trash: 4 emails checked — 4 correctly trashed (3x GCloud Alerting auto-trash, 1x VisualCV marketing)
+- Sessions: 1 run (Session 22). Chrome available for first time since Session 9. Dedup working (0 new emails to classify)
+- Pending: 0 actions queued. Queue fully cleared, pending-actions.json deleted
+- classified-ids.json: 9 entries. Healthy, well under 500 cap
+- MEMORY.md: No contradictions. 51 marketing, 2 auto-trash, 16 auto-archive, 23 keep-unread senders
+
+### Proton (24 hours)
+- Inbox: 8 emails (1 marketing VisualCV, 4 notification, 3 keep)
+- Daemon: Last active 2026-01-31T23:05Z. IDLE >24 hours. 0 emails processed
+- Daemon logs: Clean — no errors, no crashes. IDLE loop not triggering on new mail
+- MEMORY.md: No contradictions. 79 marketing, 12 never-unsubscribe, 20 notification senders
+
+### Misclassifications Found
+- No misclassifications detected on either platform
+
+### Fixes Applied
+- No MEMORY.md fixes needed — all senders correctly listed
+- No pending-actions cleanup needed — queue already cleared by Session 22
+- No cross-platform sync needed — all senders already synced from previous reviews
+
+### Key Improvement: Chrome Fixed
+- Root cause of 13-session Chrome drought identified: `claude -p` launched by launchd was missing `--chrome` flag
+- Fix applied: `--chrome` added to launchd plist command
+- Gmail organizer skill updated: now aborts entirely if Chrome unavailable (no more pending-actions fallback)
+- Verified: Session 22 test run at 10:11 AM confirmed Chrome connection and cleared all pending actions
+
+### Remaining Issues
+1. **Proton daemon idle >24h** — Bridge IMAP IDLE not triggering on new mail. Needs manual restart
+2. **Proton scanner --mailbox flag** — Still can't audit Trash/Notifications folders (known bug)
+
+---
+
+## Review — 2026-02-02 22:15 AEDT
+
+### Overall Grade: B
+
+Same state as 21:15 review. No new emails arrived in the last hour. Gmail classification remains perfect (8/8 correct) but Chrome-less, so 5 pending actions unexecuted. Proton daemon still idle >24h — 8 emails sitting in inbox unprocessed. No misclassifications. No fixes needed (all senders already in MEMORY.md from earlier reviews). Grade held at B: classification is solid, execution is the bottleneck.
+
+### Gmail (24 hours)
+- Inbox: 8 emails — 5 correctly classified for action (3x GCloud Alerting auto-trash, 1x VisualCV marketing trash, 1x YouTube archive), 3 legitimate (G2A rating reminder, McGrath real estate, Uplus real estate)
+- Trash: 0 emails — Chrome unavailable, no actions executed
+- Sessions: 5 runs (17-21), all classify-only. Dedup working perfectly (7 of 8 emails skipped as already classified)
+- Pending: 5 actions (4 trash + 1 archive), created 2026-02-02T20:10Z. Fresh, not stale
+- classified-ids.json: 9 entries. Healthy
+- MEMORY.md: No contradictions found. All 8 inbox senders already have correct rules
+
+### Proton (24 hours)
+- Inbox: 8 emails (same as Gmail via forwarding). Scanner classifications correct for all 8
+- Daemon: Last active 2026-01-31T23:05Z. IDLE >24 hours. 0 emails processed. The 8 inbox emails are NOT being handled by daemon IDLE loop
+- Daemon logs: Clean — no errors, no crashes. Just not receiving IMAP IDLE triggers for new mail
+
+### Misclassifications Found
+- No new misclassifications detected (Gmail or Proton)
+
+### Fixes Applied
+- No fixes needed — all senders already correctly listed from earlier review sessions today
+
+### Remaining Issues
+1. **Gmail Chrome dependency** — 5 pending actions, 13 sessions without execution. Organizer classifies perfectly but can't act
+2. **Proton daemon IDLE >24h** — Bridge IMAP IDLE not triggering on new mail. Needs manual restart
+3. **Proton scanner --mailbox flag** — Still can't audit Trash/Notifications folders (known bug from prior reviews)
+
+---
+
+## Review -- 2026-02-02 21:15 AEDT
+
+### Overall Grade: B
+
+Gmail classification perfect (8/8 correct). No misclassifications on either platform. But Gmail cannot execute actions (Chrome unavailable again -- 5 items queued), and Proton daemon has been idle >24 hours despite 8 new emails arriving. Both organizers can think but neither can act.
+
+### Gmail (24 hours)
+- **Inbox:** 8 emails -- 0 missed junk, 3 legitimate (kept correctly), 5 correctly classified for action but unexecuted
+  - Google Cloud Alerting x3 (alerting-noreply@google.com) -- auto-trash, pending execution
+  - YouTube (noreply@youtube.com) -- low-priority subscriber notification, pending archive
+  - VisualCV (team@visualcv.com) -- marketing, pending trash (new sender added to MEMORY.md in Session 20)
+  - G2A.COM (no-reply@g2a.com) -- transactional rating reminder, correctly kept
+  - McGrath / Luke Allan (lukeallan@mcgrath.propertyemail.com.au) -- real estate listings, correctly kept
+  - Uplus Real Estate (lily@uplusrealty.com.au) -- real estate listings, correctly kept
+- **Trash:** 0 emails -- nothing trashed in last 24h. Chrome unavailable.
+- **Sessions:** 3 runs (Sessions 19, 20, 21). Dedup working correctly (1-2 new emails per session). All classify-only.
+- **Pending:** 5 actions queued (4 trash + 1 archive), created 2026-02-02. Fresh, not stale.
+- **classified-ids.json:** 9 IDs tracked. Healthy, well under 500 cap.
+- **MEMORY.md:** No contradictions. 33 marketing, 2 auto-trash, 16 auto-archive, 23 keep-unread. VisualCV added correctly in Session 20.
+
+### Proton (24 hours)
+- **Inbox:** 8 emails (same as Gmail -- forwarding). Scanner classifications all correct:
+  - Google Cloud Alerting x3 -- notification (correct)
+  - YouTube -- notification (correct)
+  - VisualCV -- marketing (correct)
+  - G2A.COM (no-reply@) -- keep (correct, transactional)
+  - McGrath -- keep (correct, real estate)
+  - Uplus Real Estate -- keep (correct)
+- **Trash:** Cannot audit -- scanner returns same 8 emails regardless of `--mailbox` flag (known bug)
+- **Notifications:** Cannot audit -- same scanner bug
+- **Daemon:** Last active 2026-01-31 23:05 UTC. Connected, processed 0 emails, entered IDLE. Has been idle >24 hours. The 8 new emails are NOT being processed by the daemon.
+
+### Misclassifications Found
+- No misclassifications detected. All 8 Gmail emails and 8 Proton emails classified correctly.
+
+### Fixes Applied
+1. Added VisualCV (team@visualcv.com) to Proton MEMORY.md "Always Unsubscribe" list (cross-platform sync from Gmail)
+2. Added `team@visualcv.com` to Proton marketing sender patterns
+3. Updated Proton MEMORY.md timestamp to 2026-02-02
+
+### Remaining Issues
+1. **Proton daemon idle >24 hours** -- IDLE loop is not receiving new mail triggers from Proton Bridge. 8 emails sitting unprocessed. Needs manual restart or investigation into Bridge IMAP IDLE support.
+2. **Gmail Chrome still needed for execution** -- 5 pending actions queued today. The early-morning backlog clearance was effective but the pattern repeats: classify during the day, queue grows, need Chrome to clear.
+3. **Proton scanner `--mailbox` flag broken** -- Cannot audit Trash or Notifications folders. Returns inbox results regardless of flag value.
+
+---
+
+## Review -- 2026-02-02 05:30 AEDT
+
+### Overall Grade: B+
+
+Gmail classification perfect (6/6), trash correct (3/3). Proton has 1 misclassification (McGrath as notification), 1 cross-platform contradiction fixed (Bastion PG). Daemon running but idle >20h. Gmail pending backlog is fresh (2 items), no Chrome dependency issues today.
+
+### Gmail (24 hours)
+- **Inbox:** 6 emails -- 0 missed junk, 6 legitimate
+  - G2A.COM (no-reply@g2a.com) -- post-purchase rating reminder, correctly kept
+  - Google Cloud Alerting x2 (alerting-noreply@google.com) -- correctly identified as auto-trash, pending execution
+  - McGrath / Luke Allan (lukeallan@mcgrath.propertyemail.com.au) -- new real estate sender, correctly kept and added to MEMORY.md
+  - Uplus Real Estate (lily@uplusrealty.com.au) -- new real estate sender, correctly kept and added to MEMORY.md
+  - Westpac eStatement (email7.westpac.com.au) -- banking service message, correctly kept
+- **Trash:** 3 emails checked -- 3 correctly trashed, 0 mistakes
+  - Domaine Homes NSW (contact@domainehomes.com.au) -- marketing, correct
+  - Google Cloud Alerting x2 (alerting-noreply@google.com) -- auto-trash, correct
+- **Sessions:** 3 runs today (Sessions 16, 17, 18). Sessions 17-18 used `newer_than:1d` + classified-ids.json dedup -- much more efficient than previous 100-email full scans.
+- **Pending:** 2 actions queued (2x GCloud Alerting trash), age: <1 day. Fresh.
+- **classified-ids.json:** 6 IDs tracked. Healthy, well under 500 cap.
+- **MEMORY.md:** No contradictions. 32 marketing, 2 auto-trash, 16 auto-archive, 22 keep-unread.
+
+### Proton (24 hours)
+- **Inbox:** 5 emails scanned by CLI
+  - Google Cloud Alerting x2 -- correctly classified as notification
+  - G2A.COM (no-reply@g2a.com) -- correctly classified as keep (transactional)
+  - McGrath / Luke Allan -- MISCLASSIFIED as "notification" (should be keep/real estate)
+  - Uplus Real Estate -- correctly classified as keep
+- **Daemon:** Last active 2026-01-31 22:10 UTC -- processed 10 emails. Restarted at 23:05, processed 0, went to IDLE. Has been idle >20 hours.
+- **Daemon last batch accuracy:** 7/10 correct (Luxury Escapes + G2A archived instead of trashed, Westpac to Notifications instead of kept -- all pre-dating MEMORY.md sync)
+
+### Misclassifications Found
+1. **Proton: McGrath (lukeallan@mcgrath.propertyemail.com.au)** -- classified as "notification" by scanner. Should be "keep" (real estate listings). Scanner doesn't have a real estate category; fell through to notification via Precedence:bulk header.
+2. **Proton: Bastion Property Group (bastionpropertygroup.com.au)** -- was in Proton "Always Unsubscribe" but is on Gmail "Keep Unread" list. Cross-platform contradiction.
+
+### Fixes Applied
+1. Added Uplus Real Estate (lily@uplusrealty.com.au) to Proton "Never Unsubscribe"
+2. Added McGrath / Luke Allan (lukeallan@mcgrath.propertyemail.com.au) to Proton "Never Unsubscribe"
+3. Moved Bastion Property Group from Proton "Always Unsubscribe" to "Never Unsubscribe" (cross-platform contradiction fix)
+4. Added 4 trusted sender domain patterns to Proton: `*@uplusrealty.com.au`, `*@mcgrath.propertyemail.com.au`, `*@bastionpropertygroup.com.au`, `*@bastionpg.propertyemail.com.au`
+5. Updated Proton MEMORY.md timestamp
+
+### Remaining Issues
+1. **Proton daemon idle >20 hours** -- IDLE loop not receiving new mail triggers. Needs restart or Proton Bridge IMAP IDLE investigation.
+2. **Proton scanner can't distinguish mailboxes** -- `--mailbox Trash` and `--mailbox "Folders/Notifications"` return same results as inbox scan. Limits audit capability.
+3. **Gmail Chrome still needed for execution** -- Current pending is only 2 items (manageable), but future sessions will queue again without Chrome.
+
+---
+
 ## Review — 2026-02-02 08:35 AEDT
 
 ### Overall Grade: A-

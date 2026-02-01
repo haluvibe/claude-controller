@@ -7,6 +7,14 @@ allowed-tools: mcp__gmail__gmail_search_messages, mcp__gmail__gmail_read_message
 
 Scan unread emails, classify into 4 tiers (important / low-priority / marketing / auto-trash), and clean up via Chrome. Important emails stay unread. Everything else gets handled automatically.
 
+## THIS SKILL REQUIRES CLAUDE IN CHROME — NO EXCEPTIONS
+
+**CLAUDE IN CHROME IS MANDATORY. THIS SKILL MUST USE CLAUDE IN CHROME (`mcp__claude-in-chrome__*` TOOLS) TO TRASH AND ARCHIVE EMAILS. THE GMAIL MCP IS READ-ONLY AND CANNOT MODIFY EMAILS. WITHOUT CHROME, THIS SKILL CANNOT DO ITS JOB.**
+
+**CLAUDE IN CHROME IS MANDATORY. IF CHROME TOOLS ARE NOT AVAILABLE, DO NOT FALL BACK TO A QUEUE. DO NOT SAVE PENDING ACTIONS. ABORT THE ENTIRE RUN AND LOG "ABORTED: Chrome not available" TO THE SESSION LOG. CLASSIFICATION WITHOUT EXECUTION IS POINTLESS.**
+
+**CLAUDE IN CHROME IS MANDATORY. AT THE START OF EVERY RUN, CALL `mcp__claude-in-chrome__tabs_context_mcp()` FIRST. IF IT FAILS OR RETURNS AN ERROR, STOP IMMEDIATELY. DO NOT PROCEED TO CLASSIFY EMAILS. DO NOT WASTE CONTEXT ON CLASSIFICATION YOU CANNOT ACT ON.**
+
 ## Memory
 
 Before processing, read the memory file for learned preferences:
@@ -14,15 +22,21 @@ Before processing, read the memory file for learned preferences:
 
 After processing, update that file with any new decisions.
 
-## Step 0: Process Pending Actions
+## Step 0: Verify Chrome Connection (MANDATORY)
 
-Check if `.claude/skills/gmail-unsubscribe/pending-actions.json` exists. If it does AND Chrome tools (`mcp__claude-in-chrome__*`) are available:
+**Before doing ANYTHING else, verify Claude in Chrome is connected:**
+
+```
+mcp__claude-in-chrome__tabs_context_mcp({ createIfEmpty: true })
+```
+
+**If this call fails or returns an error: ABORT THE ENTIRE RUN.** Log "ABORTED: Chrome not available" to the session log and stop. Do not classify emails. Do not read emails. Do not continue.
+
+**If Chrome is connected:** Check if `.claude/skills/gmail-unsubscribe/pending-actions.json` exists. If it does:
 1. Read the file
 2. Execute each pending trash/archive action via Chrome (same procedure as Steps 4b/4c)
 3. Delete the file after all actions are processed
 4. Report how many pending actions were completed
-
-If Chrome tools are NOT available, skip this step (the queue will be processed on the next interactive run).
 
 ## Session Log
 
@@ -237,23 +251,9 @@ Use the same Gmail tab from Step 4b.
 
 3. **Repeat** for every low-priority email.
 
-### Fallback: Chrome Not Available (scheduled/headless runs)
+### If Chrome Is Not Available
 
-If Chrome tools (`mcp__claude-in-chrome__*`) are NOT available (e.g., running as a scheduled daemon via `claude -p`):
-
-1. Save all pending actions to `.claude/skills/gmail-unsubscribe/pending-actions.json`:
-   ```json
-   {
-     "created": "<ISO timestamp>",
-     "actions": [
-       {"id": "msg123", "action": "trash", "from": "spam@example.com", "subject": "..."},
-       {"id": "msg456", "action": "archive", "from": "newsletter@example.com", "subject": "..."}
-     ]
-   }
-   ```
-2. Report: "X actions queued for next interactive session (saved to pending-actions.json)"
-
-These queued actions will be processed automatically in Step 0 on the next interactive run.
+**ABORT THE ENTIRE RUN.** Do not classify. Do not save pending actions. Do not continue. Log "ABORTED: Chrome not available — cannot execute trash/archive actions" to the session log and stop.
 
 ### Rules for Steps 4b and 4c
 - **Trash:** marketing + auto-trash emails
