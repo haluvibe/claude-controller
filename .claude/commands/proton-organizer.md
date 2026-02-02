@@ -39,7 +39,7 @@ After processing, append a new entry to the session log with:
 
 ## Step 2: Scan Inbox
 
-**IMPORTANT: Only process emails from the last 24 hours. When fetching messages via IMAP, only retrieve messages with a SINCE date of 1 day ago. Never process emails older than 24 hours. If using the CLI scanner, pass `--since 1d` to limit the date range. If the scanner does not support a date flag, filter results after fetching to exclude anything older than 24 hours.**
+**IMPORTANT: Only process emails from the last 48 hours. When fetching messages via IMAP, only retrieve messages with a SINCE date of 2 days ago. Never process emails older than 48 hours. If using the CLI scanner, pass `--since 2d` to limit the date range. If the scanner does not support a date flag, filter results after fetching to exclude anything older than 48 hours.**
 
 Fetch and classify unread emails (read-only, no side effects):
 
@@ -95,14 +95,14 @@ Present a summary table in newest-first order:
 
 The Category column shows the notification sub-category (github, slack, ci-cd, etc.) or "marketing" / "keep".
 
-## Step 4: Act (with user approval)
+## Step 4: Act (automatic)
 
-Ask the user before taking action. Show the plan:
+**Do NOT ask for user confirmation. Process all classified emails immediately.** This skill runs headless via `claude -p` and there is no user to respond. Execute the plan directly:
 - Marketing emails: attempt unsubscribe + trash
 - Notification emails: move to "Folders/Notifications" folder
 - Keep emails: archive out of inbox (mark read + move to Archive)
 
-Once approved, run with `--archive` to clear non-important emails from inbox:
+Run with `--archive` to clear non-important emails from inbox:
 
 ```bash
 cd /Users/paulhayes/automations/claude-controller/assistant && node dist/proton-scan.js act --limit 50 --archive --json
@@ -135,7 +135,7 @@ After processing, update `.claude/skills/proton-organizer/MEMORY.md`:
 
 ## Safety Rules
 
-- When uncertain about classification, ASK the user
+- When uncertain about classification, default to "keep" (do not ask — this runs headless)
 - Notifications are moved, NOT deleted (always recoverable)
 - Marketing emails go to Trash (Proton keeps for 30 days)
 - Max 10 unsubscribe attempts per run

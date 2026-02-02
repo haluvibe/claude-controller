@@ -4,6 +4,157 @@ Timestamped findings from automated email stack reviews.
 
 ---
 
+## Review — 2026-02-04 01:45 AEDT
+
+### Overall Grade: B
+
+Gmail organizer running well — 12 sessions in 48h, Chrome available for 7 consecutive sessions (S22-S28), dedup working, no pending backlog, classification mostly accurate. One repeat misclassification (Mission Events job app trashed again — 4th consecutive review, code-level bug). Proton daemon idle >48h since 2026-02-01T23:27Z. Proton scanner Trash returned 1 result this time (partial improvement) but Notifications still returns 0.
+
+### Gmail (48 hours)
+- Inbox: 18 emails — 0 missed junk, 18 legitimate (2x Otter.ai work notes, 1x WeAreShovels job app, 1x Mission welcome, 1x Resolve Recruit job app, 6x SEEK Applications, 1x Workable job app, 2x Indeed job matches, 1x Google Cloud Alerting, 1x G2A rating reminder, 1x McGrath real estate, 1x Uplus real estate)
+- Trash: 17 emails checked — 16 correctly trashed (7x Google Cloud Alerting, 1x PartnerStack, 1x Coursera/Deep Teaching, 1x Wise, 1x Firebase App Distribution, 1x Firebase crash, 2x Temu, 1x St.George cashback, 1x VisualCV), **1 mistake** (Mission Events job app)
+- Sessions: 12 runs (S17-S28), 7 consecutive with Chrome (S22-S28), dedup working (1-3 new emails per session)
+- Pending: 0 actions queued — no backlog
+- classified-ids.json: 37 entries — healthy (cap: 500)
+
+### Proton (48 hours)
+- Inbox: 10 emails scanned — 2 marketing, 0 notification, 8 kept (all classifications correct via MEMORY.md overrides)
+- Trash: 1 email checked (St.George marketing) — correctly trashed
+- Notifications: 0 emails returned (scanner still can't read this folder)
+- Daemon: Last active 2026-02-01T23:27Z, processed 8 on restart (1 trashed VisualCV, 4 moved to notifications, 3 kept), entered IDLE. **Idle >48 hours.** Not processing new arrivals.
+- Errors: 0
+
+### Misclassifications Found
+1. **Mission Events Team** (events@e.mission.dev) — "Your journey to Senior Frontend Engineer (React and Typescript) at Travel Solutions has begun!", 2026-02-02 03:59 UTC, Gmail trash — job application email incorrectly trashed. **4th consecutive review** flagging this. Sender IS in MEMORY.md Keep list (added 2026-02-02) but organizer still trashes it — unsubscribe link in email body triggers false-positive marketing classification that overrides Keep memory match. Requires code fix to prioritize MEMORY.md Keep rules over body-based marketing detection.
+
+### Fixes Applied
+1. Cross-platform sync verified: no new senders needed syncing — marketing and keep lists already aligned from previous review.
+2. No MEMORY.md contradictions found on either platform.
+3. No stale pending actions (file doesn't exist).
+4. classified-ids.json healthy at 37 entries (under 500 cap).
+
+### Remaining Issues
+1. **Mission Events (events@e.mission.dev) repeat trashing** — 4th consecutive review. Sender is in Gmail Keep list since 2026-02-02 but organizer still trashes it. Root cause: unsubscribe link in email body triggers false-positive marketing classification override. Needs a code fix to prioritize MEMORY.md Keep rules over body-based marketing detection.
+2. **Proton daemon idle >48h** — Bridge IMAP IDLE not triggering on new mail. Needs manual restart.
+3. **Proton scanner --mailbox flag** — Trash now returns 1 result (partial improvement from 0 in prior reviews). Notifications still returns 0.
+
+---
+
+## Review — 2026-02-04 00:30 AEDT
+
+### Overall Grade: B
+
+Gmail organizer running well — 12 sessions in 48h, Chrome available for 7 consecutive sessions (S22-S28), dedup working, no pending backlog, classification mostly accurate. One repeat misclassification (Mission Events job app trashed again despite being in Keep list). Proton daemon idle since Feb 2 with 45 emails unprocessed. One cross-platform contradiction fixed (G2A no-reply@). One "Needs Review" sender resolved (Coursera).
+
+### Gmail (48 hours)
+- Inbox: 18 emails — 0 missed junk, 18 legitimate (2x Otter.ai work notes, 1x WeAreShovels job app, 1x Mission welcome, 1x Resolve Recruit job app, 6x SEEK Applications, 1x Workable job app, 2x Indeed job matches, 1x Google Cloud Alerting, 1x G2A rating reminder, 1x McGrath real estate, 1x Uplus real estate, 1x Mathspace job app)
+- Trash: 17 emails checked — 16 correctly trashed (7x Google Cloud Alerting, 1x PartnerStack, 1x Coursera/Deep Teaching, 1x Wise, 1x Firebase App Distribution, 1x Firebase crash, 2x Temu, 1x St.George cashback, 1x VisualCV), **1 mistake** (Mission Events job app)
+- Sessions: 12 runs (S17-S28), 7 consecutive with Chrome (S22-S28), dedup working (1-3 new emails per session)
+- Pending: 0 actions queued — no backlog
+- classified-ids.json: 37 entries — healthy (cap: 500)
+
+### Proton (48 hours)
+- Inbox: 45 emails scanned — 8 marketing, 9 notification, 28 kept
+- Trash: Cannot audit (scanner --mailbox flag bug, known issue)
+- Notifications: Cannot audit (same bug)
+- Daemon: Last active 2026-02-01T23:27Z, processed 8 on restart, entered IDLE. **Idle >48 hours.** 45 emails sitting unprocessed.
+- Errors: 0
+
+### Misclassifications Found
+1. **Mission Events Team** (events@e.mission.dev) — "Your journey to Senior Frontend Engineer (React and Typescript) at Travel Solutions has begun!", 2026-02-02 03:59 UTC, Gmail trash — job application email incorrectly trashed. **Repeat** of same issue from 2026-02-02 20:30 and 2026-02-03 21:00 reviews. Sender IS in MEMORY.md Keep list but organizer still trashes it — unsubscribe link in email body triggers false-positive marketing classification that overrides Keep memory match. Requires code fix.
+
+### Fixes Applied
+1. Proton MEMORY.md: Removed G2A.COM no-reply@g2a.com from Always Unsubscribe (was contradicting Gmail's correct classification as transactional). Added to Never Unsubscribe.
+2. Gmail MEMORY.md: Moved Deep Teaching Solutions / Coursera (m.mail.coursera.org) from Needs Review to Always Unsubscribe (recurring weekly newsletter, resolved as marketing).
+3. Cross-platform sync: Verified — no additional senders needed syncing beyond the G2A fix. Marketing and keep lists aligned.
+
+### Remaining Issues
+1. **Mission Events (events@e.mission.dev) repeat trashing** — 3rd consecutive review flagging this. Sender is in Gmail Keep list since 2026-02-02 but organizer still trashes it. Root cause: unsubscribe link in email body triggers false-positive marketing classification override. Needs a code fix to prioritize MEMORY.md Keep rules over body-based marketing detection.
+2. **Proton daemon idle >48h** — Bridge IMAP IDLE not triggering on new mail. 45 emails sitting unprocessed. Needs manual restart.
+3. **Proton scanner --mailbox flag** — Still can't audit Trash/Notifications folders (known bug, unresolved across all reviews).
+
+---
+
+## Review — 2026-02-03 21:00 AEDT
+
+### Overall Grade: B+
+
+Gmail organizer running well -- Session 26 completed with Chrome, 1 archive action executed, classification accurate. Two issues: 1 repeat misclassification (Mission Events job app trashed again), 3 Google Cloud Alerting auto-trash emails sitting in inbox unactioned, and 1 new marketing sender (PartnerStack) missed. Proton daemon idle >48 hours, 44 emails unprocessed in inbox. Proton scanner misclassified Otter.ai as marketing.
+
+### Gmail (24 hours)
+- Inbox: 19 emails -- 3 missed auto-trash (Google Cloud Alerting), 1 missed marketing (PartnerStack), 1 needs-review (Coursera newsletter), 14 legitimate (2 Otter.ai work, 1 Workable job app, 5 SEEK apps, 2 Indeed matches, 1 Mission Welcome, 1 WeAreShovels app, 1 Resolve Recruit app, 1 SEEK Change Recruitment)
+- Trash: 9 emails checked -- 8 correctly trashed (2x GCloud Alerting, 1x Wise marketing, 1x Firebase App Dist, 2x Temu, 1x Firebase crash, 1x St.George marketing), **1 mistake** (Mission Events job app)
+- Sessions: 1 run (Session 26), Chrome available (5th consecutive), 1 archive executed (Slack weekly)
+- Pending: 0 actions queued -- no backlog
+- classified-ids.json: 33 entries -- healthy (cap: 500)
+
+### Proton (24 hours)
+- Inbox: 44 emails scanned by CLI -- 10 marketing, 8 notification, 26 kept
+- Daemon: Last active 2026-02-01T23:27Z, processed 8 on restart, entered IDLE. **Idle >48 hours.** 44 emails sitting unprocessed.
+- Daemon last batch: 8 emails processed correctly (4 notifications moved, 1 marketing trashed, 3 kept/archived)
+- Proton scanner: Otter.ai (no-reply@otter.ai) misclassified as marketing (no-reply@ pattern + unsubscribe link triggered false positive). Should be "keep" (work meeting notes).
+- Errors: 0
+
+### Misclassifications Found
+1. **Mission Events Team** (events@e.mission.dev) -- "Your journey to Senior Frontend Engineer (React and Typescript) at Travel Solutions has begun!", 2026-02-02 03:59 UTC, Gmail trash -- job application email incorrectly trashed. This is a **repeat** of the same misclassification found in the 2026-02-02 20:30 review. Sender IS in MEMORY.md Keep list (added 2026-02-02) but organizer still trashing it. The unsubscribe link in the email body triggers a false positive classification override.
+2. **Proton: Otter.ai** (no-reply@otter.ai) -- "Meeting Summary for Weekly Kick-Off", 2026-02-02 12:04 UTC -- classified as marketing by Proton scanner (0.6 confidence, no-reply@ sender pattern + unsubscribe language). Should be "keep" (work meeting notes shared by colleague).
+3. **Gmail: PartnerStack** (letschat@partnerstack.com) -- "What top B2B brands did to reach $2.7B GMV", 2026-02-02 18:08 UTC -- new marketing sender sitting in inbox unactioned, not in MEMORY.md.
+4. **Gmail: 3x Google Cloud Alerting** (alerting-noreply@google.com) -- auto-trash list match but still sitting in inbox unactioned (arrived after Session 26 ran).
+
+### Fixes Applied
+1. Gmail MEMORY.md: Added PartnerStack (partnerstack.com) to Always Unsubscribe + Marketing Senders
+2. Gmail MEMORY.md: Added Deep Teaching Solutions / Coursera (m.mail.coursera.org) to Needs Review
+3. Proton MEMORY.md: Added Otter.ai (no-reply@otter.ai) to Never Unsubscribe (work meeting notes)
+4. Proton MEMORY.md: Added SEEK Pass (no-reply@seekpass.co) to Never Unsubscribe (2FA codes)
+5. Proton MEMORY.md: Added PartnerStack (partnerstack.com) to Always Unsubscribe + Marketing Senders
+6. Cross-platform sync: 3 senders Gmail->Proton (Otter.ai, SEEK Pass, PartnerStack)
+7. Updated both MEMORY.md timestamps to 2026-02-03
+
+### Remaining Issues
+1. **Mission Events (events@e.mission.dev) repeat trashing** -- Sender is in Gmail Keep list since 2026-02-02 but organizer still trashes it. Root cause: the unsubscribe link in email body triggers false-positive marketing classification that overrides the Keep memory match. Needs a code fix to prioritize MEMORY.md Keep rules over body-based marketing detection.
+2. **Proton daemon idle >48h** -- Bridge IMAP IDLE not triggering on new mail. 44 emails sitting unprocessed. Needs manual restart.
+3. **Proton scanner no-reply@ false positives** -- no-reply@otter.ai classified as marketing despite being work content. Scanner doesn't check Never Unsubscribe list for no-reply@ pattern exemptions.
+4. **Coursera/Deep Teaching Solutions** -- New recurring newsletter sender (no-reply@m.mail.coursera.org). Added to Needs Review for user decision. "Cheery Friday Greetings from Barb Oakley!" educational content.
+
+---
+
+## Review — 2026-02-02 20:30 AEDT
+
+### Overall Grade: B+
+
+**Summary:** Gmail organizer running well with 9 sessions in last 24h and Chrome available for 4 consecutive sessions. One misclassification (Mission Events job application email trashed). Proton daemon running but IDLE since restart -- not processing new arrivals for ~21 hours. 5 new senders memorized, 14 cross-platform senders synced.
+
+### Gmail (24 hours)
+- Inbox: 14 emails -- 1 missed low-priority (Slack weekly summary should have been archived), 1 missed auto-trash (Google Cloud Alerting at 01:05 UTC), 4 new job platform senders not yet in memory, 8 legitimate job application confirmations correctly kept
+- Trash: 11 emails checked -- 10 correctly trashed (2x Temu, 1x Wise, 3x GCloud Alerting, 1x Firebase crash, 1x Firebase App Dist, 1x VisualCV, 1x St.George), **1 mistake** (Mission Events job app trashed)
+- Sessions: 9 runs (S17-S25), all classified, 4 consecutive with Chrome (S22-S25)
+- Pending: 0 actions queued -- no backlog
+- classified-ids.json: 33 entries -- healthy (cap: 500)
+
+### Proton (24 hours)
+- Inbox: 38 emails scanned -- 10 marketing, 6 notifications, 22 kept
+- Daemon: Started 2026-02-01T23:27Z, processed 8 on startup (4 notifications moved, 1 marketing trashed, 3 kept/archived), entered IDLE. No further processing for ~21 hours.
+- Daemon bug: Luxury Escapes classified as "keep" on 2026-01-31 despite being in marketing list (stale MEMORY.md)
+- Errors: 0
+
+### Misclassifications Found
+1. **Mission Events Team** (events@e.mission.dev) -- "Your journey to Senior Frontend Engineer at Travel Solutions has begun!", 2026-02-02 03:59 UTC, Gmail -- job application email incorrectly trashed (sender not in memory, unsubscribe link triggered false positive)
+2. **Proton: Luxury Escapes** (email@m.luxuryescapes.com) -- classified as "keep" on 2026-01-31 despite being in Always Unsubscribe list (daemon loaded stale MEMORY.md from before the sender was added)
+
+### Fixes Applied
+1. Gmail MEMORY.md: Added 4 new job application platform senders (Mission/mission.dev, Resolve Recruit/idibu, Workable, WeAreShovels/Join.com)
+2. Gmail MEMORY.md: Updated job application pattern recognition list
+3. Proton MEMORY.md: Added 3 marketing senders synced from Gmail (St.George, Temu, Caluga Farm Store)
+4. Proton MEMORY.md: Added 11 job application senders to Never Unsubscribe (SEEK Applications, Canva, Indeed x2, Bookipi, Mission x2, Workable, Join.com, Resolve Recruit)
+5. Cross-platform sync: 14 senders Gmail->Proton, 0 Proton->Gmail
+
+### Remaining Issues
+1. **Proton daemon IDLE >21h:** Not processing new mail. Needs restart to pick up ~10 marketing emails in Proton inbox.
+2. **Proton daemon stale MEMORY.md:** Doesn't hot-reload; needs code fix to reload on IDLE wakeup or file watch.
+3. **Slack weekly summary in Gmail inbox:** feedback@slack.com in Auto-Archive list but not caught -- organizer should handle next run.
+
+---
+
 ## Review — 2026-02-03 00:30 AEDT
 
 ### Overall Grade: A-

@@ -53,10 +53,10 @@ After processing, append a new entry to the session log with:
 
 ## Step 1: Search Unread Emails
 
-**IMPORTANT: Only process emails from the last 24 hours. Use the Gmail search query `is:unread newer_than:1d` instead of just `is:unread`. Never process emails older than 24 hours.**
+**IMPORTANT: Only process emails from the last 48 hours. Use the Gmail search query `is:unread newer_than:2d` instead of just `is:unread`. Never process emails older than 48 hours.**
 
 ```
-mcp__gmail__gmail_search_messages({ q: "is:unread newer_than:1d", maxResults: 100 })
+mcp__gmail__gmail_search_messages({ q: "is:unread newer_than:2d", maxResults: 100 })
 ```
 
 If there are more results (nextPageToken returned), fetch additional pages until all unread emails are retrieved or 200 emails are reached.

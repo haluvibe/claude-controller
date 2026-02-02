@@ -4,6 +4,334 @@ Running log of every Gmail organizer session. Each entry records what was scanne
 
 ---
 
+## Session 28 (2026-02-03)
+
+**Status:** Completed
+**Date:** 2026-02-03
+**Emails scanned:** 17 (last 48 hours, `newer_than:2d`), 1 new after dedup
+**Chrome available:** Yes
+
+### Classifications
+| Category | Count |
+|----------|-------|
+| Keep | 0 (new) |
+| Low-priority | 1 (new) |
+| Marketing | 0 (new) |
+| Auto-trash | 0 (new) |
+
+### Actions Taken
+| Time | Action | Target | Result |
+|------|--------|--------|--------|
+| -- | Verify Chrome | tabs_context_mcp | Connected (2 tabs, Gmail already open) |
+| -- | Check pending actions | pending-actions.json | No file found (none pending) |
+| -- | Scan unread (last 48h) | `is:unread newer_than:2d` | 17 emails found, 1 new after dedup |
+| -- | Classify 1 new email | Inbox (newest first) | Completed (memory match) |
+| -- | Archive low-priority #1 | LinkedIn Messaging (19c202baa45ad27d) | Read+Archived via Chrome |
+
+### New Senders Added
+- None (LinkedIn already in Auto-Read + Archive list)
+
+### Email Details (newest first)
+1. LinkedIn Messaging (messages-noreply@linkedin.com) -> **low-priority** (messaging digest, "Messages from Dr. Theoni and 6 others", CATEGORY_SOCIAL, memory match) -- ARCHIVED
+2-17. Already classified in Sessions 17-27 (skipped via dedup)
+
+### Pending Actions
+- None (all actions executed immediately via Chrome)
+
+### Errors
+- None
+
+### Notes
+- Chrome available and working -- 7th consecutive Chrome session (S22-S28)
+- Only 1 new email since Session 27: LinkedIn messaging digest (CATEGORY_SOCIAL)
+- LinkedIn messaging digests: same pattern as connection updates (messages-noreply@ vs messages-noreply@), both low-priority
+- Archive at (340, 88) confirmed working -- "Inbox x" badge removed
+- Very quiet inbox: mostly job application confirmations and real estate listings left unread (all "keep")
+- No marketing emails, no unsubscribe attempts needed
+- Total emails processed all-time: ~1143+
+
+---
+
+## Session 27 (2026-02-03)
+
+**Status:** Completed
+**Date:** 2026-02-03
+**Emails scanned:** 16 (last 24 hours, `newer_than:1d`), 3 new after dedup
+**Chrome available:** Yes
+
+### Classifications
+| Category | Count |
+|----------|-------|
+| Keep | 0 (new) |
+| Low-priority | 0 (new) |
+| Marketing | 1 (new) |
+| Auto-trash | 2 (new) |
+
+### Actions Taken
+| Time | Action | Target | Result |
+|------|--------|--------|--------|
+| -- | Verify Chrome | tabs_context_mcp | Connected (2 tabs, Gmail already open) |
+| -- | Check pending actions | pending-actions.json | No file found (none pending) |
+| -- | Scan unread (last 24h) | `is:unread newer_than:1d` | 16 emails found, 3 new after dedup |
+| -- | Classify 3 new emails | Inbox (newest first) | Completed (all memory matches) |
+| -- | Trash auto-trash #1 | GCloud Alerting (19c1ff4a17667e8f) | Read+Trashed via Chrome |
+| -- | Trash marketing #1 | PartnerStack (19c1f8ae44b35148) | Read+Trashed via Chrome |
+| -- | Trash auto-trash #2 | GCloud Alerting (19c1e9423bd1826e) | Read+Trashed via Chrome |
+
+### New Senders Added
+- None (all 3 emails matched existing memory patterns)
+
+### Email Details (newest first)
+1. Google Cloud Alerting (alerting-noreply@google.com) -> **auto-trash** (Firebase RTDB billed bytes alert, memory match) -- TRASHED
+2. PartnerStack (letschat@partnerstack.com) -> **marketing** (B2B GMV report promo, CATEGORY_PROMOTIONS, memory match) -- TRASHED
+3. Google Cloud Alerting (alerting-noreply@google.com) -> **auto-trash** (Firebase RTDB billed bytes alert, memory match) -- TRASHED
+4-16. Already classified in Sessions 23-26 (skipped via dedup)
+
+### Pending Actions
+- None (all actions executed immediately via Chrome)
+
+### Errors
+- None
+
+### Notes
+- Chrome available and working -- 6th consecutive Chrome session (S22-S27)
+- All 3 emails matched existing memory patterns, no new senders to add
+- PartnerStack: already on Always Unsubscribe list from Session 26 review agent addition
+- Quiet inbox: only 3 new emails since Session 26, all junk
+- Total emails processed all-time: ~1142+
+
+---
+
+## Session 26 (2026-02-03)
+
+**Status:** Completed
+**Date:** 2026-02-03
+**Emails scanned:** 15 (last 24 hours, `newer_than:1d`), 3 new after dedup
+**Chrome available:** Yes
+
+### Classifications
+| Category | Count |
+|----------|-------|
+| Keep | 2 (new) |
+| Low-priority | 1 (new) |
+| Marketing | 0 (new) |
+| Auto-trash | 0 (new) |
+
+### Actions Taken
+| Time | Action | Target | Result |
+|------|--------|--------|--------|
+| -- | Verify Chrome | tabs_context_mcp | Connected (2 tabs, Gmail already open) |
+| -- | Check pending actions | pending-actions.json | No file found (cleared in S22-25) |
+| -- | Scan unread (last 24h) | `is:unread newer_than:1d` | 15 emails found, 3 new after dedup |
+| -- | Classify 3 new emails | Inbox (newest first) | Completed |
+| -- | Archive low-priority #1 | Slack weekly summary (19c1dc3373228071) | Read+Archived via Chrome |
+
+### New Senders Added
+- Otter.ai / Nick Humphries (no-reply@otter.ai) -> Keep (work meeting notes/recordings shared by colleague)
+
+### Email Details (newest first)
+1. Nick Humphries via Otter.ai (no-reply@otter.ai) -> **keep** (Meeting Summary for Weekly Kick-Off, work meeting notes shared by colleague)
+2. Nick Humphries via Otter.ai (no-reply@otter.ai) -> **keep** (Shared Weekly Kick-Off conversation in Otter, same meeting recording)
+3. Slack (feedback@slack.com) -> **low-priority** (Train Effective workspace weekly summary, memory match for Slack) -- ARCHIVED
+4-15. Already classified in Sessions 24-25 (skipped via dedup)
+
+### Pending Actions
+- None (all actions executed immediately via Chrome)
+
+### Errors
+- None
+
+### Notes
+- Chrome available and working -- 5th consecutive Chrome session (S22-S26)
+- New sender: Otter.ai (no-reply@otter.ai) -- meeting transcription/notes sharing service. These are work meeting notes shared by a colleague (Nick Humphries), not marketing. Classify as keep.
+- Slack weekly workspace summary: existing memory match (feedback@slack.com same pattern as no-reply@slack.com), low-priority
+- Archive button at (340, 88) confirmed working -- "Inbox x" badge removed after click
+- No marketing emails, no unsubscribe attempts needed
+- Quiet inbox: only 3 new emails since Session 25
+- Total emails processed all-time: ~1139+
+
+---
+
+## Session 25 (2026-02-02)
+
+**Status:** Completed
+**Date:** 2026-02-02
+**Emails scanned:** 15 (last 24 hours, `newer_than:1d`), 3 new after dedup
+**Chrome available:** Yes
+
+### Classifications
+| Category | Count |
+|----------|-------|
+| Keep | 0 (new) |
+| Low-priority | 0 (new) |
+| Marketing | 1 (new) |
+| Auto-trash | 2 (new) |
+
+### Actions Taken
+| Time | Action | Target | Result |
+|------|--------|--------|--------|
+| -- | Verify Chrome | tabs_context_mcp | Connected (2 tabs, Gmail already open) |
+| -- | Check pending actions | pending-actions.json | No file found (cleared in S22-24) |
+| -- | Scan unread (last 24h) | `is:unread newer_than:1d` | 15 emails found, 3 new after dedup |
+| -- | Classify 3 new emails | Memory matches (newest first) | Completed |
+| -- | Trash auto-trash #1 | Google Cloud Alerting (19c1d7103dd59546) | Read+Trashed via Chrome |
+| -- | Trash auto-trash #2 | Google Cloud Alerting (19c1d2af00943c20) | Read+Trashed via Chrome |
+| -- | Trash marketing #1 | Wise marketing (19c1cbdd228e5c5f) | Read+Trashed via Chrome |
+
+### Email Details (newest first)
+1. Google Cloud Alerting (alerting-noreply@google.com) -> **auto-trash** (memory match, Firebase RTDB billing alert) -- TRASHED
+2. Google Cloud Alerting (alerting-noreply@google.com) -> **auto-trash** (memory match, Firebase RTDB billing alert) -- TRASHED
+3. Wise (noreply@info.wise.com) -> **marketing** (memory match, "Ready to earn a return?", info.wise.com = marketing) -- TRASHED
+4-15. Already classified in Session 24 (skipped via dedup)
+
+### Pending Actions
+- None (all actions executed immediately via Chrome)
+
+### Errors
+- None
+
+### Notes
+- Chrome available and working -- 4th consecutive Chrome session (S22 + S23 + S24 + S25)
+- All 3 new emails matched existing memory patterns -- no new senders
+- Wise marketing (info.wise.com) vs Wise service (noreply@wise.com) split continues to work well
+- Google Cloud Alerting auto-trash pattern stable
+- Quiet inbox aside from Firebase billing alerts
+- No unsubscribe attempts: no new marketing senders with accessible List-Unsubscribe headers
+- Total emails processed all-time: ~1136+
+
+---
+
+## Session 24 (2026-02-02)
+
+**Status:** Completed
+**Date:** 2026-02-02
+**Emails scanned:** 20 (last 24 hours, `newer_than:1d`), 13 new after dedup
+**Chrome available:** Yes
+
+### Classifications
+| Category | Count |
+|----------|-------|
+| Keep | 7 (new) |
+| Low-priority | 3 (new) |
+| Marketing | 1 (new) |
+| Auto-trash | 2 (new) |
+
+### Actions Taken
+| Time | Action | Target | Result |
+|------|--------|--------|--------|
+| -- | Verify Chrome | tabs_context_mcp | Connected (2 tabs, Gmail already open) |
+| -- | Check pending actions | pending-actions.json | No file found (cleared in S22-23) |
+| -- | Scan unread (last 24h) | `is:unread newer_than:1d` | 20 emails found, 13 new after dedup |
+| -- | Classify 13 new emails | Inbox (newest first) | Completed |
+| -- | Trash marketing #1 | Temu (19c1c1bf03a04d4e) | Read+Trashed via Chrome |
+| -- | Trash auto-trash #1 | Firebase App Distribution (19c1ca42159b9c1b) | Read+Trashed via Chrome |
+| -- | Trash auto-trash #2 | Firebase crash report (19c1c0e1cc779c20) | Read+Trashed via Chrome |
+| -- | Archive low-priority #1 | TestFlight (19c1ca66c410bc57) | Read+Archived via Chrome |
+| -- | Archive low-priority #2 | App Store Connect (19c1ca5037d885e2) | Read+Archived via Chrome |
+| -- | Archive low-priority #3 | Amplitude (19c1c2546d384ff6) | Read+Archived via Chrome |
+
+### New Senders Added
+- Indeed Job Match (donotreply@match.indeed.com) -> Keep (automated job match recommendations during active job search)
+- SEEK Pass (no-reply@seekpass.co) -> Keep (2FA access codes for SEEK Pass sign-in)
+
+### Email Details (newest first)
+1. TestFlight (no_reply@email.apple.com) -> **low-priority** (Train Effective iOS build 3.2.481, memory match) -- ARCHIVED
+2. App Store Connect (no_reply@email.apple.com) -> **low-priority** (build issues warning, memory match) -- ARCHIVED
+3. Firebase App Distribution (firebase-noreply@google.com) -> **auto-trash** (Android build distribution, sender match) -- TRASHED
+4. Amplitude (noreply@amplitude.com) -> **low-priority** (weekly data health summary, memory match) -- ARCHIVED
+5. Temu (email@market.temuemail.com) -> **marketing** (memory match, "Your package is arriving soon!", CATEGORY_PROMOTIONS) -- TRASHED
+6. Firebase (firebase-noreply@google.com) -> **auto-trash** (trending stability issues, crash report, memory match) -- TRASHED
+7. Indeed (donotreply@match.indeed.com) -> **keep** (new sender, Software Engineer at Better Recovery Group + 9 more)
+8. Indeed (donotreply@match.indeed.com) -> **keep** (Staff Engineer - Front End @ Greenstone Financial Services)
+9. Indeed (donotreply@match.indeed.com) -> **keep** (Java Full Stack Developer @ Spait Infotech)
+10. Indeed (donotreply@match.indeed.com) -> **keep** (Full Stack Software Engineer @ Greenstone Financial Services)
+11. SEEK Pass (no-reply@seekpass.co) -> **keep** (new sender, 2FA access code 811616)
+12. Indeed Apply (indeedapply@indeed.com) -> **keep** (application: Front-End Engineer - Recipes)
+13. Indeed Apply (indeedapply@indeed.com) -> **keep** (application: Senior UI Software Engineer React)
+14-20. Already classified (Canva, Indeed alert, Indeed Apply Canva, Bookipi, G2A, McGrath, GCloud Alerting) -- skipped via dedup
+
+### Pending Actions
+- None (all actions executed immediately via Chrome)
+
+### Errors
+- None
+
+### Notes
+- Chrome available and working -- 3rd consecutive Chrome session (S22 + S23 + S24)
+- Active job search continues: 3 Indeed job match recommendations + 2 new application confirmations
+- Indeed sender split now fully documented: match.indeed.com (job recs) = keep, indeedapply@ (app confirmations) = keep, alert@ (job alerts) = keep
+- SEEK Pass: new 2FA/security sender, always keep
+- Dev build cycle: Train Effective v3.2.481 build pushed (TestFlight iOS, Firebase Android, App Store Connect issues)
+- Firebase App Distribution (firebase-noreply@google.com): classified as auto-trash per sender pattern, even though build notifications differ from crash reports
+- Archive button at (340, 88) confirmed working reliably in All Mail view
+- Trash button at (421, 88) confirmed working reliably
+- No unsubscribe attempts: Temu has no accessible List-Unsubscribe header
+- Total emails processed all-time: ~1133+
+
+---
+
+## Session 23 (2026-02-02)
+
+**Status:** Completed
+**Date:** 2026-02-02
+**Emails scanned:** 13 (last 24 hours, `newer_than:1d`), 11 new after dedup
+**Chrome available:** Yes
+
+### Classifications
+| Category | Count |
+|----------|-------|
+| Keep | 9 (new) |
+| Low-priority | 0 (new) |
+| Marketing | 2 (new) |
+| Auto-trash | 0 (new) |
+
+### Actions Taken
+| Time | Action | Target | Result |
+|------|--------|--------|--------|
+| -- | Verify Chrome | tabs_context_mcp | Connected (2 tabs, Gmail already open) |
+| -- | Scan unread (last 24h) | `is:unread newer_than:1d` | 13 emails found, 11 new after dedup |
+| -- | Classify 11 new emails | Inbox (newest first) | Completed |
+| -- | Trash marketing #1 | Temu (19c1bae0464bfefd) | Read+Trashed via Chrome |
+| -- | Trash marketing #2 | St.George (19c1bac8f559ae1d) | Read+Trashed via Chrome |
+
+### New Senders Added
+- Canva Recruiting (recruitment.canva.com) -> Keep (job application confirmations via SmartRecruiters)
+- Indeed (indeed.com) -> Keep (job alert activations + application confirmations)
+- Bookipi (bookipi.com) -> Keep (job application confirmation)
+- St.George Marketing (e.stgeorge.com.au) -> Marketing (ShopBack cashback promos, distinct from Internetadmin@ banking alerts)
+
+### Email Details (newest first)
+1. Canva (notification@recruitment.canva.com) -> **keep** (Principal Frontend Engineer application confirmation)
+2. Indeed (alert@indeed.com) -> **keep** (job alert activation, principal software engineer Sydney)
+3. Indeed Apply (indeedapply@indeed.com) -> **keep** (application confirmation, Canva via Indeed)
+4. Bookipi (hello@bookipi.com) -> **keep** (Senior Front-End Developer application confirmation)
+5. SEEK Applications (s.seek.com.au) -> **keep** (application: Change Recruitment - Frontend Engineer)
+6. SEEK Applications (s.seek.com.au) -> **keep** (application: NewAge Recruitment - Future IT)
+7. SEEK Applications (s.seek.com.au) -> **keep** (application: Murray Irrigation - Frontend Software Engineer)
+8. SEEK Applications (s.seek.com.au) -> **keep** (application: Forward Talent - software engineer mobile/frontend)
+9. SEEK Applications (s.seek.com.au) -> **keep** (application: Expertech - Senior Front End Engineer WFH)
+10. Temu (email@market.temuemail.com) -> **marketing** (memory match, "Free Items" spam, CATEGORY_PROMOTIONS) -- TRASHED
+11. St.George (email@e.stgeorge.com.au) -> **marketing** (new sender, ShopBack cashback promos, unsubscribe link) -- TRASHED
+12-13. Already classified (G2A.COM keep, McGrath keep) -- skipped via dedup
+
+### Pending Actions
+- None (all actions executed immediately via Chrome)
+
+### Errors
+- None
+
+### Notes
+- Chrome available and working -- second consecutive Chrome session (S22 + S23)
+- Very active job application session: 9 of 11 new emails are application confirmations
+- Applications submitted: Canva (Principal Frontend Engineer), 5 SEEK roles, Bookipi (Senior Front-End Developer)
+- Indeed job alert set up for "principal software engineer" in Sydney NSW
+- St.George banking split confirmed: e.stgeorge.com.au = marketing (ShopBack/cashback), Internetadmin@stgeorge.com.au = banking alerts (keep from S22)
+- Bookipi uses Brevo/Sendinblue for tracking (sendibt2.com pixel) but email is transactional -- not marketing
+- No unsubscribe attempts: neither Temu nor St.George marketing had List-Unsubscribe header accessible via Gmail API
+- Total emails processed all-time: ~1120+
+
+---
+
 ## Session 22 (2026-02-02)
 
 **Status:** Completed

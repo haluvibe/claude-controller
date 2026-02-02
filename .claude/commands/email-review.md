@@ -5,18 +5,18 @@ allowed-tools: mcp__gmail__gmail_search_messages, mcp__gmail__gmail_read_message
 
 # Email Review Agent
 
-Audit the last 24 hours of emails across Gmail and Proton Mail. Verify the organizers (Gmail organizer + Proton daemon) classified and actioned everything correctly — nothing important was trashed, nothing junk was left in the inbox, no senders are being repeatedly re-processed instead of memorized.
+Audit the last 48 hours of emails across Gmail and Proton Mail. Verify the organizers (Gmail organizer + Proton daemon) classified and actioned everything correctly — nothing important was trashed, nothing junk was left in the inbox, no senders are being repeatedly re-processed instead of memorized.
 
 **You MUST fix problems as you find them.** When you discover a missing sender, edit MEMORY.md immediately before moving on. When you find stale pending actions, delete the file right then. Do not defer fixes to a recommendations section — apply them inline as each issue is discovered. This is the mechanism by which the whole stack improves over time.
 
-## Step 1: Check Gmail (last 24 hours)
+## Step 1: Check Gmail (last 48 hours)
 
 ### 1a. Review what's sitting in the inbox
 
-Search for emails still in the inbox from the last 24 hours:
+Search for emails still in the inbox from the last 48 hours:
 
 ```
-mcp__gmail__gmail_search_messages({ q: "in:inbox newer_than:1d", maxResults: 50 })
+mcp__gmail__gmail_search_messages({ q: "in:inbox newer_than:2d", maxResults: 50 })
 ```
 
 Read each email. For each one, check:
@@ -31,7 +31,7 @@ Read each email. For each one, check:
 Search for recently trashed emails:
 
 ```
-mcp__gmail__gmail_search_messages({ q: "in:trash newer_than:1d", maxResults: 50 })
+mcp__gmail__gmail_search_messages({ q: "in:trash newer_than:2d", maxResults: 50 })
 ```
 
 Read each email. For each one, check:
@@ -42,7 +42,7 @@ Read each email. For each one, check:
 
 ### 1c. Review the session log
 
-Read `.claude/skills/gmail-unsubscribe/SESSION-LOG.md` (last 24h entries only). Check:
+Read `.claude/skills/gmail-unsubscribe/SESSION-LOG.md` (last 48h entries only). Check:
 - How many runs in the last 24 hours?
 - Are any senders showing up repeatedly (being reclassified each run instead of memorized)?
 - Are runs actually taking action (trash/archive) or just classifying with no follow-through?
@@ -71,7 +71,7 @@ Read `.claude/skills/gmail-unsubscribe/classified-ids.json` if it exists:
 
 **FIX INLINE:** If the file has >500 entries, trim to the most recent 200.
 
-## Step 2: Check Proton Mail (last 24 hours)
+## Step 2: Check Proton Mail (last 48 hours)
 
 ### 2a. Scan current inbox
 
@@ -100,7 +100,7 @@ Check the results:
 
 ### 2c. Check Proton daemon logs
 
-Read `~/Library/Logs/proton-daemon/stdout.log` (last 24 hours of entries). Check:
+Read `~/Library/Logs/proton-daemon/stdout.log` (last 48 hours of entries). Check:
 - Is the daemon actively processing incoming mail?
 - Any errors or connection drops?
 - How many emails has it sorted?
@@ -140,13 +140,13 @@ Grading criteria:
 - C: 3-5 issues, some service problems, growing backlog
 - D: 6+ issues, services failing, large unresolved backlog
 
-### Gmail (24 hours)
+### Gmail (48 hours)
 - Inbox: X emails — Y missed junk, Z legitimate
 - Trash: X emails checked — Y correctly trashed, Z mistakes
 - Sessions: X runs, Y took action
 - Pending: X actions queued (age: Y days)
 
-### Proton (24 hours)
+### Proton (48 hours)
 - Inbox: X emails
 - Trash: X emails checked for false positives
 - Notifications: X emails checked for false positives
@@ -201,7 +201,7 @@ These files are yours to improve:
 
 ## Rules
 
-- **Last 24 hours only.** Don't process or report on anything older.
+- **Last 48 hours only.** Don't process or report on anything older.
 - **Be specific.** Cite sender addresses, subject lines, dates, and counts. Don't say "looks good" — say "42 emails in trash, all correctly classified marketing."
 - **Focus on mistakes.** The most valuable output is catching things the organizers got wrong — important emails trashed, junk left in inbox, senders not memorized.
 - **Fix what you can.** If a sender keeps being reclassified, add it to memory. If a rule is wrong, fix it. If pending actions are stale, clear them. Don't just report — improve.
