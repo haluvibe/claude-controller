@@ -233,7 +233,15 @@ export class ProtonClient implements EmailSender {
    * calling onNewMail (so the handler can acquire its own locks),
    * then re-acquires for the next IDLE cycle.  On connection failure
    * the ImapFlow instance is fully recreated.
+   *
+   * Proton Bridge does not reliably push IMAP IDLE EXISTS notifications,
+   * so we race idle() against a poll timer. If idle() hasn't resolved
+   * after IDLE_POLL_INTERVAL_MS we break out, check for new mail anyway,
+   * and re-enter IDLE. This guarantees the daemon processes incoming
+   * mail within the poll interval even if Bridge never sends EXISTS.
    */
+  private static readonly IDLE_POLL_INTERVAL_MS = 5 * 60 * 1000; // 5 minutes
+
   async startIdle(
     mailbox: string,
     onNewMail: () => Promise<void>,
@@ -246,14 +254,25 @@ export class ProtonClient implements EmailSender {
         let lock;
         try {
           lock = await this.imap.getMailboxLock(mailbox);
-          // idle() resolves when the server sends an EXISTS update or the
-          // idle timeout (29 min default) expires.
-          await this.imap.idle();
+
+          // Race idle() against a poll timeout. If Proton Bridge sends an
+          // EXISTS notification idle() resolves immediately; otherwise we
+          // time out after IDLE_POLL_INTERVAL_MS and poll manually.
+          const idleResult = await Promise.race([
+            this.imap.idle().then(() => 'exists' as const),
+            new Promise<'timeout'>(r =>
+              setTimeout(() => r('timeout'), ProtonClient.IDLE_POLL_INTERVAL_MS),
+            ),
+          ]);
+
           lock.release();
           lock = undefined;
 
           if (running) {
             backoff = 10_000; // reset backoff on success
+            if (idleResult === 'timeout') {
+              console.log('[ProtonClient] IDLE poll timeout — checking for new mail');
+            }
             await onNewMail();
           }
         } catch (err) {

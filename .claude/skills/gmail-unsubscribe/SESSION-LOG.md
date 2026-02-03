@@ -4,6 +4,110 @@ Running log of every Gmail organizer session. Each entry records what was scanne
 
 ---
 
+## Session 30 (2026-02-03)
+
+**Status:** Completed
+**Date:** 2026-02-03
+**Emails scanned:** 20 (last 48 hours, `newer_than:2d`), 4 new after dedup
+**Chrome available:** Yes
+
+### Classifications
+| Category | Count |
+|----------|-------|
+| Keep | 3 (new) |
+| Low-priority | 0 (new) |
+| Marketing | 1 (new) |
+| Auto-trash | 0 (new) |
+
+### Actions Taken
+| Time | Action | Target | Result |
+|------|--------|--------|--------|
+| -- | Verify Chrome | tabs_context_mcp | Connected (9 tabs, Gmail already open) |
+| -- | Check pending actions | pending-actions.json | No file found (none pending) |
+| -- | Scan unread (last 48h) | `is:unread newer_than:2d` | 20 emails found, 4 new after dedup |
+| -- | Classify 4 new emails | Inbox (newest first) | Completed (3 keep + 1 marketing) |
+| -- | Trash marketing #1 | Temu (19c2142402d45fc1) | Read+Trashed via Chrome |
+
+### New Senders Added
+- None (all matched existing memory patterns)
+
+### Email Details (newest first)
+1. Workable / Employment Hero (noreply@candidates.workablemail.com) -> **keep** (Tech Lead - MarTech application confirmation, existing Workable pattern match)
+2. SEEK Reminders (noreply@s.seek.com.au) -> **keep** (application reminder for Compas Pty Ltd, s.seek.com.au = keep per memory)
+3. Temu (email@market.temuemail.com) -> **marketing** (memory match, "Pay only $0.01" spam) -- TRASHED
+4. Oz Combined Realty (sales@ozcomrealty.com.au) -> **keep** (real estate "Coming Soon" listing, memory match)
+5-20. Already classified in Sessions 23-29 (skipped via dedup)
+
+### Pending Actions
+- None (all actions executed immediately via Chrome)
+
+### Errors
+- None
+
+### Notes
+- Chrome available and working -- 9th consecutive Chrome session (S22-S30)
+- Active job application activity continues: Workable (Employment Hero) and SEEK Reminders are both job-related, kept
+- SEEK Reminders from s.seek.com.au follows the s.seek.com.au = keep pattern (application-related, not marketing)
+- Temu marketing spam continues to arrive, auto-trashed per existing memory
+- Oz Combined Realty: real estate listing continues, keep per memory pattern
+- Trash button at (421, 88) confirmed working reliably
+- No new senders to add to memory -- all patterns matched existing rules
+- Total emails processed all-time: ~1151+
+
+---
+
+## Session 29 (2026-02-03)
+
+**Status:** Completed
+**Date:** 2026-02-03
+**Emails scanned:** 19 (last 48 hours, `newer_than:2d`), 4 new after dedup
+**Chrome available:** Yes
+
+### Classifications
+| Category | Count |
+|----------|-------|
+| Keep | 1 (new) |
+| Low-priority | 0 (new) |
+| Marketing | 0 (new) |
+| Auto-trash | 3 (new) |
+
+### Actions Taken
+| Time | Action | Target | Result |
+|------|--------|--------|--------|
+| -- | Verify Chrome | tabs_context_mcp | Connected (4 tabs, Gmail already open) |
+| -- | Check pending actions | pending-actions.json | No file found (none pending) |
+| -- | Scan unread (last 48h) | `is:unread newer_than:2d` | 19 emails found, 4 new after dedup |
+| -- | Classify 4 new emails | Inbox (newest first) | Completed (3 memory match + 1 new sender) |
+| -- | Trash auto-trash #1 | GCloud Alerting (19c20eb5df27d1b0) | Read+Trashed via Chrome |
+| -- | Trash auto-trash #2 | Firebase crash (19c20b526e271d4c) | Read+Trashed via Chrome |
+| -- | Trash auto-trash #3 | GCloud Alerting (19c2064c154d4491) | Read+Trashed via Chrome |
+
+### New Senders Added
+- Leonardo.Ai (hello@m.leonardo.ai) -> Keep (API pricing change notice, explicitly "not a marketing email", no unsubscribe link)
+
+### Email Details (newest first)
+1. Google Cloud Alerting (alerting-noreply@google.com) -> **auto-trash** (Firebase RTDB billed bytes alert, memory match) -- TRASHED
+2. Firebase (firebase-noreply@google.com) -> **auto-trash** (new fatal issue, com.traineffective 3.2.477, memory match) -- TRASHED
+3. Leonardo.Ai (hello@m.leonardo.ai) -> **keep** (new sender, Pay-As-You-Go API pricing change, CATEGORY_UPDATES, IMPORTANT, explicitly states "not a marketing email")
+4. Google Cloud Alerting (alerting-noreply@google.com) -> **auto-trash** (Firebase RTDB billed bytes alert, memory match) -- TRASHED
+5-19. Already classified in Sessions 23-28 (skipped via dedup)
+
+### Pending Actions
+- None (all actions executed immediately via Chrome)
+
+### Errors
+- None
+
+### Notes
+- Chrome available and working -- 8th consecutive Chrome session (S22-S29)
+- 1 new sender: Leonardo.Ai (m.leonardo.ai) -- API pricing change from Pay-As-You-Go model. Despite `m.` subdomain (often marketing), the email explicitly states "This is not a marketing or promotional email" and has no unsubscribe link. Classified as keep (service notice for existing API user).
+- Firebase crash report: new fatal issue in com.traineffective 3.2.477 (io.invertase.firebase.auth) -- auto-trash per sender pattern
+- Trash button at (421, 88) confirmed working reliably
+- No marketing emails, no unsubscribe attempts needed
+- Total emails processed all-time: ~1147+
+
+---
+
 ## Session 28 (2026-02-03)
 
 **Status:** Completed

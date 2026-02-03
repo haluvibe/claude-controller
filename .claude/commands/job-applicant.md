@@ -9,12 +9,18 @@ Automated job application assistant. Searches job boards for React/JavaScript ro
 
 ## Memory
 
+**MEMORY.md is the persistent state across sessions. You MUST read it before doing anything and update it after every action. Each `claude -p` session starts with zero context — MEMORY.md is the ONLY way to know what jobs have already been applied to. Without it, you will apply to the same job twice.**
+
 Before processing, read all memory and config files:
-- `.claude/skills/job-applicant/MEMORY.md` -- user profile, applied jobs, preferences, platform notes
+- `.claude/skills/job-applicant/MEMORY.md` -- user profile, applied jobs, preferences, platform notes. **Read this FIRST — it contains the Applied Jobs table that prevents duplicate applications.**
 - `.claude/skills/job-applicant/resume.md` -- canonical resume (source of truth for cover letters)
 - `.claude/skills/job-applicant/cover-letter-template.md` -- cover letter template
 
-After processing, update MEMORY.md with new applications and any platform learnings.
+After processing, update MEMORY.md with:
+- Every job processed (Applied, Skipped, or Failed) added to the "Applied Jobs" table
+- Any new screening Q&A pairs
+- Any new platform notes
+- Updated statistics
 
 ## Session Log
 
@@ -23,19 +29,33 @@ After processing, append a new session entry.
 
 ## Step 0: Pre-Flight
 
+**THIS SKILL REQUIRES CLAUDE IN CHROME. All browsing, searching, form filling, and application submission MUST be done through the `mcp__claude-in-chrome__*` browser tools. Do NOT use Bash with curl/wget or any other method to interact with websites. If Chrome is not available, ABORT — do not attempt to proceed without it.**
+
 1. Verify Chrome is available:
    ```
    mcp__claude-in-chrome__tabs_context_mcp({ createIfEmpty: true })
    ```
-   If Chrome tools fail, abort: "Chrome is required for job applications. Please ensure the Claude in Chrome extension is connected."
+   If Chrome tools fail, **ABORT IMMEDIATELY**: "Chrome is required for job applications. Please ensure the Claude in Chrome extension is connected." Do NOT continue.
 
 2. Load MEMORY.md, resume.md, and cover-letter-template.md.
 
 3. Check the user's input:
    - If URLs are provided: process those specific job listings
-   - If no URLs: search the target websites from MEMORY.md for React/JavaScript roles
+   - If a **platform** is specified (e.g., "LinkedIn", "SEEK", "Web3 Career"): search **only that platform** for this session
+   - If no platform or URLs specified: **ask the user** which platform(s) to target this session
+   - Multiple terminals can run concurrently on different platforms. The MEMORY.md Applied Jobs table is the shared dedup source — always read it fresh before each application to avoid cross-session duplicates.
 
 ## CRITICAL RULES
+
+### Fully Remote Only
+- **ONLY apply for fully remote positions. This is non-negotiable.**
+- Skip ANY job that is not explicitly listed as "remote", "work from home", or "WFH".
+- Hybrid roles (e.g., "2 days in office") do NOT qualify — skip them.
+- If the listing says "remote" but specifies a city/office for occasional attendance, that is hybrid — skip it.
+- On-site roles — skip, regardless of how good the match is.
+- When searching SEEK, always filter by "Work from home" location. When searching other boards, always include "remote" in the search query.
+- If a listing's remote status is ambiguous or unclear, skip it. Do not assume remote.
+- **This filter is applied BEFORE all other criteria.** A perfect React role that requires office attendance is still a skip.
 
 ### Never Fabricate Skills
 - **ONLY reference skills, technologies, experience, and qualifications that exist in `resume.md`.**
@@ -49,6 +69,14 @@ After processing, append a new session entry.
 - The strategy is: cast a wide net by applying to everything React/JavaScript-related, but never misrepresent skills or experience.
 - Do NOT skip a job because the listing mentions technologies not in the resume. Only skip if the role has zero React/JavaScript relevance.
 
+### Never Apply Twice
+- **NEVER apply to the same job more than once. This is non-negotiable.**
+- Before processing ANY job, check the "Applied Jobs" table in MEMORY.md.
+- Match on: company name + role title, OR URL (normalized — ignore query params, trailing slashes, http vs https).
+- If already applied (any status: Applied, Failed, Skipped): **skip immediately**, no exceptions.
+- Same company + same role title = duplicate, even if the URL is different (e.g., posted on SEEK and also on the company site).
+- When in doubt, skip. Applying twice looks unprofessional and can get the application rejected.
+
 ### Cover Letter Integrity
 - Cover letters must ONLY cite skills and experience that appear in `resume.md`.
 - Focus on the strongest overlaps between the job requirements and the resume.
@@ -57,20 +85,38 @@ After processing, append a new session entry.
 
 ## Step 1: Search Job Boards
 
-If no specific URLs were provided, search each target website:
+**Only search the platform(s) selected for this session.** If the user specified a platform (e.g., "LinkedIn"), search ONLY that platform. If specific URLs were provided, process those directly. If neither, ask the user which platform to target.
+
+**Re-read MEMORY.md Applied Jobs table before searching** to have the latest dedup state (another terminal may have added entries since session start).
 
 ### SEEK
 1. Navigate to `https://www.seek.com.au`
-2. Search for "React" or "JavaScript" in the relevant location
-3. Extract job listing URLs from search results
-4. Filter: only jobs with React or JavaScript in the title or description
+2. Search for "React" or "JavaScript" with location set to **"Work from home"**
+3. Sort by **Date** to prioritise fresh listings
+4. Extract job listing URLs from search results
+5. Filter: only jobs that are **fully remote** AND have React or JavaScript in the title or description
+6. Skip any result that is hybrid or on-site
+7. **Login required:** User must already be logged into SEEK for Quick Apply. If not logged in, ask user to log in first.
+
+### LinkedIn
+1. Navigate to `https://www.linkedin.com/jobs/`
+2. Search for "React" or "JavaScript"
+3. Apply filters: **Remote** (under Location), **Past week** (under Date Posted)
+4. Extract job listing URLs from search results
+5. Filter: only jobs that are **fully remote** AND have React or JavaScript relevance
+6. Skip hybrid or on-site roles
+7. Prefer **Easy Apply** listings (applications stay within LinkedIn) but also process external-redirect listings
+8. **Login required:** User must already be logged into LinkedIn. If not logged in, ABORT and ask user to log in manually. Never enter credentials.
 
 ### Web3 Career
 1. Navigate to `https://web3.career`
-2. Search for React or JavaScript roles
+2. Search for "React remote" or "JavaScript remote" roles
 3. Extract job listing URLs from search results
+4. Skip any result that is not fully remote
 
 Collect up to 10 job URLs per session (configurable in Preferences).
+
+**Reminder: Every job must be fully remote. Skip anything that isn't.**
 
 ## Step 2: Extract Job Details
 
@@ -91,11 +137,13 @@ For each job URL:
 
 ## Step 3: Deduplication Check
 
+**NEVER apply to the same job twice. This check is mandatory for every job.**
+
 For each extracted job:
 1. Check MEMORY.md "Applied Jobs" table.
-2. Match on: company name + role title, OR URL (normalized).
-3. If match found with status `Applied`: skip it, report "Already applied to [Company] - [Role]. Skipping."
-4. If match found with status `Failed`: ask user "Previously failed to apply. Retry?"
+2. Match on: company name + role title, OR URL (normalized — ignore query params, trailing slashes, protocol).
+3. Same company + same role title = duplicate, even if found on a different platform or URL.
+4. If match found with ANY status (`Applied`, `Failed`, `Skipped`): **skip immediately**. Report "Already applied/attempted [Company] - [Role]. Skipping." Do NOT retry failed applications without explicit user instruction.
 
 ## Step 4: Generate Cover Letter
 
@@ -165,6 +213,14 @@ After user approves the cover letter:
    - Checkboxes (privacy policy, terms): check them
    - Multi-step forms: navigate through each step
    - "How did you hear about us?": "Job Board" or the platform name
+9. **LinkedIn Easy Apply specifics:**
+   - Easy Apply opens a multi-step modal (not a new page). Navigate each step with "Next" until "Review" and then "Submit application".
+   - Phone, email, and resume are usually pre-filled from the LinkedIn profile. Verify they are correct; only override if wrong.
+   - Cover letter field may or may not appear — if present, paste the generated cover letter. If absent, skip (LinkedIn Easy Apply often has no cover letter field).
+   - Screening questions appear as text inputs, dropdowns, radio buttons, or yes/no toggles within the modal steps. Answer using MEMORY.md Common Screening Answers + resume.md.
+   - Resume upload: LinkedIn may offer to use the profile resume or upload a new one. If an upload option exists, upload `~/Documents/resume26.pdf`. If upload fails, the profile resume is acceptable.
+   - **Do NOT click "Follow [Company]"** checkboxes that sometimes appear on the final step — uncheck if pre-checked.
+   - After submission, LinkedIn shows a confirmation message. Screenshot it for the session log.
 
 ## Step 6: Pre-Submit Review
 
