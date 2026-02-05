@@ -4,6 +4,568 @@ Running log of every Gmail organizer session. Each entry records what was scanne
 
 ---
 
+## Session 41 (2026-02-05)
+
+**Status:** Completed
+**Date:** 2026-02-05
+**Emails scanned:** 23 (last 48 hours, `newer_than:2d`), 17 new after dedup
+**Chrome available:** Yes
+
+### Classifications
+| Category | Count |
+|----------|-------|
+| Keep | 13 (new) |
+| Low-priority | 2 (new) |
+| Marketing | 1 (new) |
+| Auto-trash | 2 (new) |
+
+### Actions Taken
+| Time | Action | Target | Result |
+|------|--------|--------|--------|
+| -- | Verify Chrome | tabs_context_mcp | Connected (13 tabs, Gmail already open) |
+| -- | Check pending actions | pending-actions.json | No file found (none pending) |
+| -- | Scan unread (last 48h) | `is:unread newer_than:2d` | 23 emails found, 17 new after dedup |
+| -- | Classify 17 new emails | Inbox (newest first) | Completed (13 keep + 2 low-priority + 1 marketing + 2 auto-trash) |
+| -- | Trash marketing #1 | Stroud Homes Nowra (19c2b41a86f8fc9c) | Read+Trashed via Chrome |
+| -- | Trash auto-trash #1 | Firebase crash (19c2b3d431437234) | Read+Trashed via Chrome |
+| -- | Trash auto-trash #2 | GCloud Alerting (19c2b3851e1886dc) | Read+Trashed via Chrome |
+| -- | Archive low-priority #1 | TestFlight (19c2b3a93b11eb1b) | Read+Archived via Chrome |
+| -- | Archive low-priority #2 | App Store Connect (19c2b398a151216a) | Read+Archived via Chrome |
+
+### New Senders Added
+- Stroud Homes Nowra (stroudhomes.com.au) -> Marketing: home builder newsletter via Mailchimp, CATEGORY_PROMOTIONS
+
+### Email Details (newest first)
+1. Stroud Homes Nowra (info@stroudhomes.com.au) -> **marketing** (new sender, home builder newsletter, Mailchimp, CATEGORY_PROMOTIONS) -- TRASHED
+2. Firebase (firebase-noreply@google.com) -> **auto-trash** (memory match, crash report) -- TRASHED
+3. TestFlight (no-reply@email.apple.com) -> **low-priority** (memory match, beta build notification) -- ARCHIVED
+4. App Store Connect (no_reply@email.apple.com) -> **low-priority** (memory match, app review notification) -- ARCHIVED
+5. Google Cloud Alerting (alerting-noreply@google.com) -> **auto-trash** (memory match, billing alert) -- TRASHED
+6-17. Job applications, real estate alerts, and banking service emails -> **keep** (left unread)
+
+### Keep Emails (13)
+- Job applications: multiple LinkedIn Easy Apply confirmations, Seek applications
+- Real estate: McGrath, Domain alerts
+- Banking: St.George service message (NOT marketing - explicitly states "This is a service message...not a marketing email")
+
+### Pending Actions
+- None (all actions executed immediately via Chrome)
+
+### Errors
+- None
+
+### Notes
+- Chrome available and working -- 20th consecutive Chrome session (S22-S41)
+- 1 new marketing sender: Stroud Homes Nowra (stroudhomes.com.au) - home builder newsletter
+- St.George email correctly identified as SERVICE message (interest rate changes), not marketing
+- Trash button at (421, 88) and archive button at (301, 88) working reliably
+- Total emails processed all-time: ~1200+
+
+---
+
+## Session 40 (2026-02-05)
+
+**Status:** Completed
+**Date:** 2026-02-05
+**Emails scanned:** 10 (last 48 hours, `newer_than:2d`), 2 new after dedup
+**Chrome available:** Yes
+
+### Classifications
+| Category | Count |
+|----------|-------|
+| Keep | 0 (new) |
+| Low-priority | 0 (new) |
+| Marketing | 1 (new) |
+| Auto-trash | 1 (new) |
+
+### Actions Taken
+| Time | Action | Target | Result |
+|------|--------|--------|--------|
+| -- | Verify Chrome | tabs_context_mcp | Connected (13 tabs, Gmail already open) |
+| -- | Check pending actions | pending-actions.json | No file found (none pending) |
+| -- | Scan unread (last 48h) | `is:unread newer_than:2d` | 10 emails found, 2 new after dedup |
+| -- | Classify 2 new emails | Inbox (newest first) | Completed (1 marketing + 1 auto-trash) |
+| -- | Trash auto-trash #1 | GCloud Alerting (19c2a41495661b8f) | Read+Trashed via Chrome |
+| -- | Trash marketing #1 | PartnerStack (19c2a3e2657e121d) | Read+Trashed via Chrome |
+
+### New Senders Added
+- None (both matched existing memory patterns)
+
+### Email Details (newest first)
+1. Google Cloud Alerting (alerting-noreply@google.com) -> **auto-trash** (memory match, Firebase RTDB billing alert) -- TRASHED
+2. PartnerStack (letschat@partnerstack.com) -> **marketing** (memory match, "2026 Network Report" B2B promo, CATEGORY_PROMOTIONS) -- TRASHED
+3-10. Already classified in Sessions 35-39 (skipped via dedup)
+
+### Pending Actions
+- None (all actions executed immediately via Chrome)
+
+### Errors
+- None
+
+### Notes
+- Chrome available and working -- 19th consecutive Chrome session (S22-S40)
+- Both new emails matched existing memory patterns -- no new senders
+- Google Cloud Alerting: auto-trash per memory (Firebase RTDB billed bytes alert)
+- PartnerStack: marketing per memory (B2B partnership network promos, CATEGORY_PROMOTIONS)
+- Trash button at (421, 88) confirmed working reliably
+- Total emails processed all-time: ~1180+
+
+---
+
+## Session 39 (2026-02-05)
+
+**Status:** Completed
+**Date:** 2026-02-05
+**Emails scanned:** 10 (last 48 hours, `newer_than:2d`), 3 new after dedup
+**Chrome available:** Yes
+
+### Classifications
+| Category | Count |
+|----------|-------|
+| Keep | 1 (new) |
+| Low-priority | 0 (new) |
+| Marketing | 0 (new) |
+| Auto-trash | 2 (new) |
+
+### Actions Taken
+| Time | Action | Target | Result |
+|------|--------|--------|--------|
+| -- | Verify Chrome | tabs_context_mcp | Connected (13 tabs, Gmail already open) |
+| -- | Check pending actions | pending-actions.json | No file found (none pending) |
+| -- | Scan unread (last 48h) | `is:unread newer_than:2d` | 10 emails found, 3 new after dedup |
+| -- | Classify 3 new emails | Inbox (newest first) | Completed (1 keep + 2 auto-trash) |
+| -- | Trash auto-trash #1 | Firebase crash (19c29881e2a0137a) | Read+Trashed via Chrome |
+| -- | Trash auto-trash #2 | GCloud Alerting (19c28cccd178404f) | Read+Trashed via Chrome |
+
+### New Senders Added
+- McIntyre Property (sales@mcintyreproperty.com.au) -> Keep: real estate property alerts (Canberra area, Conder listing)
+
+### Email Details (newest first)
+1. Firebase (firebase-noreply@google.com) -> **auto-trash** (memory match, crash report com.traineffective 3.2.477) -- TRASHED
+2. McIntyre Property (sales@mcintyreproperty.com.au) -> **keep** (new sender, real estate property alert, matches keep pattern)
+3. Google Cloud Alerting (alerting-noreply@google.com) -> **auto-trash** (memory match, Firebase RTDB billing alert) -- TRASHED
+4-10. Already classified in Sessions 35-38 (skipped via dedup)
+
+### Pending Actions
+- None (all actions executed immediately via Chrome)
+
+### Errors
+- None
+
+### Notes
+- Chrome available and working -- 18th consecutive Chrome session (S22-S39)
+- 1 new keep sender: McIntyre Property (mcintyreproperty.com.au) - Canberra real estate agent with property alerts
+- Firebase crash report + Google Cloud Alerting: existing memory matches, auto-trashed
+- Trash button at (421, 88) confirmed working reliably
+- Total emails processed all-time: ~1178+
+
+---
+
+## Session 38 (2026-02-05)
+
+**Status:** Completed
+**Date:** 2026-02-05
+**Emails scanned:** 10 (last 48 hours, `newer_than:2d`), 4 new after dedup
+**Chrome available:** Yes
+
+### Classifications
+| Category | Count |
+|----------|-------|
+| Keep | 1 (new) |
+| Low-priority | 0 (new) |
+| Marketing | 1 (new) |
+| Auto-trash | 2 (new) |
+
+### Actions Taken
+| Time | Action | Target | Result |
+|------|--------|--------|--------|
+| -- | Verify Chrome | tabs_context_mcp | Connected (13 tabs, Gmail already open) |
+| -- | Check pending actions | pending-actions.json | No file found (none pending) |
+| -- | Scan unread (last 48h) | `is:unread newer_than:2d` | 10 emails found, 4 new after dedup |
+| -- | Classify 4 new emails | Inbox (newest first) | Completed (1 keep + 1 marketing + 2 auto-trash) |
+| -- | Trash auto-trash #1 | GCloud Alerting (19c28951ddfee791) | Read+Trashed via Chrome |
+| -- | Trash auto-trash #2 | GCloud Alerting (19c2885b430de8c3) | Read+Trashed via Chrome |
+| -- | Trash marketing #1 | Temu (19c28203591e2f9b) | Read+Trashed via Chrome |
+
+### New Senders Added
+- Karbon rejection (ayanna.alexander@karbonhq.com) -> Keep: job application response (rejection for Fullstack Engineer role)
+
+### Email Details (newest first)
+1. Google Cloud Alerting (alerting-noreply@google.com) -> **auto-trash** (memory match, Firebase RTDB billing alert) -- TRASHED
+2. Karbon (ayanna.alexander@karbonhq.com) -> **keep** (new: job application rejection, karbonhq.com = keep pattern)
+3. Google Cloud Alerting (alerting-noreply@google.com) -> **auto-trash** (memory match, Firebase RTDB billing alert) -- TRASHED
+4. Temu (email@market.temuemail.com) -> **marketing** (memory match, "3 Complimentary Items" spam) -- TRASHED
+5-10. Already classified in Sessions 35-37 (skipped via dedup)
+
+### Pending Actions
+- None (all actions executed immediately via Chrome)
+
+### Errors
+- None
+
+### Notes
+- Chrome available and working -- 17th consecutive Chrome session (S22-S38)
+- 1 new keep sender: Karbon (karbonhq.com) - job application rejection email, extends existing keep pattern for job app communications
+- Temu and Google Cloud Alerting x2: existing memory matches, trashed
+- Trash button at (421, 88) confirmed working reliably
+- Total emails processed all-time: ~1175+
+
+---
+
+## Session 37 (2026-02-04)
+
+**Status:** Completed
+**Date:** 2026-02-04
+**Emails scanned:** 9 (last 48 hours, `newer_than:2d`), 2 new after dedup
+**Chrome available:** Yes
+
+### Classifications
+| Category | Count |
+|----------|-------|
+| Keep | 0 (new) |
+| Low-priority | 0 (new) |
+| Marketing | 1 (new) |
+| Auto-trash | 1 (new) |
+
+### Actions Taken
+| Time | Action | Target | Result |
+|------|--------|--------|--------|
+| -- | Verify Chrome | tabs_context_mcp | Connected (13 tabs, Gmail already open) |
+| -- | Check pending actions | pending-actions.json | No file found (none pending) |
+| -- | Scan unread (last 48h) | `is:unread newer_than:2d` | 9 emails found, 2 new after dedup |
+| -- | Classify 2 new emails | Inbox (newest first) | Completed (1 marketing + 1 auto-trash) |
+| -- | Trash marketing #1 | Temu (19c27b24b1971d15) | Read+Trashed via Chrome |
+| -- | Trash auto-trash #1 | GCloud Alerting (19c275bb2b6378b4) | Read+Trashed via Chrome |
+
+### New Senders Added
+- None (both emails matched existing memory patterns)
+
+### Email Details (newest first)
+1. Temu (email@market.temuemail.com) -> **marketing** (memory match, "YOU PAY: $0.01" spam, CATEGORY_UPDATES) -- TRASHED
+2. Google Cloud Alerting (alerting-noreply@google.com) -> **auto-trash** (memory match, Firebase RTDB billing alert) -- TRASHED
+3-9. Already classified in Sessions 26-36 (skipped via dedup)
+
+### Pending Actions
+- None (all actions executed immediately via Chrome)
+
+### Errors
+- None
+
+### Notes
+- Chrome available and working -- 16th consecutive Chrome session (S22-S37)
+- Quiet inbox: only 2 new emails since Session 36, both junk (Temu marketing, Firebase billing alert)
+- All emails matched existing memory patterns -- no new senders
+- Trash button at (421, 88) confirmed working reliably
+- Total emails processed all-time: ~1171+
+
+---
+
+## Session 36 (2026-02-04)
+
+**Status:** Completed
+**Date:** 2026-02-04
+**Emails scanned:** 11 (last 48 hours, `newer_than:2d`), 5 new after dedup
+**Chrome available:** Yes
+
+### Classifications
+| Category | Count |
+|----------|-------|
+| Keep | 2 (new) |
+| Low-priority | 0 (new) |
+| Marketing | 2 (new) |
+| Auto-trash | 1 (new) |
+
+### Actions Taken
+| Time | Action | Target | Result |
+|------|--------|--------|--------|
+| -- | Verify Chrome | tabs_context_mcp | Connected (12 tabs, Gmail already open) |
+| -- | Check pending actions | pending-actions.json | No file found (none pending) |
+| -- | Scan unread (last 48h) | `is:unread newer_than:2d` | 11 emails found, 5 new after dedup |
+| -- | Classify 5 new emails | Inbox (newest first) | Completed (2 keep + 2 marketing + 1 auto-trash) |
+| -- | Trash marketing #1 | Flare Cars (19c26eea920c70f5) | Read+Trashed via Chrome |
+| -- | Trash marketing #2 | Mission e.mission.dev (19c26ce6f6792389) | Read+Trashed via Chrome |
+| -- | Trash auto-trash #1 | GCloud Alerting (19c262fb557af0cf) | Read+Trashed via Chrome |
+
+### New Senders Added
+- Flare Cars (noreply@flarehr.com) -> Marketing: novated lease promos via customer.io, "save $32,952" tax pitch
+- Pluralis Research (no-reply@ashbyhq.com) -> Keep: job application confirmation via Ashby platform
+
+### Email Details (newest first)
+1. Flare Cars (noreply@flarehr.com) -> **marketing** (new sender, novated lease promos, customer.io, "upgrade your savings", unsubscribe link) -- TRASHED
+2. Pluralis Research (no-reply@ashbyhq.com) -> **keep** (new sender, job application confirmation for Senior/Staff Frontend Engineer via Ashby)
+3. Mission Talent Team (updates@e.mission.dev) -> **marketing** (memory match: e.mission.dev = marketing drip, application reminder) -- TRASHED
+4. SEEK Pass Support (support@seekpass.co) -> **keep** (memory match: seekpass.co = keep, privacy policy update)
+5. Google Cloud Alerting (alerting-noreply@google.com) -> **auto-trash** (memory match, Firebase RTDB billing alert) -- TRASHED
+6-11. Already classified in Sessions 23-35 (skipped via dedup)
+
+### Pending Actions
+- None (all actions executed immediately via Chrome)
+
+### Errors
+- None
+
+### Notes
+- Chrome available and working -- 15th consecutive Chrome session (S22-S36)
+- 2 new senders discovered: Flare Cars (marketing), Pluralis Research (job app via Ashby)
+- Flare Cars: workplace benefits/novated lease marketing from flarehr.com, sent via customer.io. Classic marketing email with savings pitch and unsubscribe link.
+- Pluralis Research: new job application platform (Ashby/ashbyhq.com), added to keep patterns alongside Workable, Lever, etc.
+- Mission e.mission.dev: memory match confirmed (already on Always Unsubscribe list from Session 35)
+- SEEK Pass: privacy policy update, memory match (support@seekpass.co = keep)
+- Trash button at (421, 88) confirmed working reliably
+- Total emails processed all-time: ~1169+
+
+---
+
+## Session 35 (2026-02-04)
+
+**Status:** Completed
+**Date:** 2026-02-04
+**Emails scanned:** 16 (last 48 hours, `newer_than:2d`), 3 new after dedup
+**Chrome available:** Yes
+
+### Classifications
+| Category | Count |
+|----------|-------|
+| Keep | 1 (new) |
+| Low-priority | 0 (new) |
+| Marketing | 0 (new) |
+| Auto-trash | 2 (new) |
+
+### Actions Taken
+| Time | Action | Target | Result |
+|------|--------|--------|--------|
+| -- | Verify Chrome | tabs_context_mcp | Connected (9 tabs, Gmail already open) |
+| -- | Check pending actions | pending-actions.json | No file found (none pending) |
+| -- | Scan unread (last 48h) | `is:unread newer_than:2d` | 16 emails found, 3 new after dedup |
+| -- | Classify 3 new emails | Inbox (newest first) | Completed (1 keep + 2 auto-trash) |
+| -- | Trash auto-trash #1 | GCloud Alerting (19c261292b29a8c3) | Read+Trashed via Chrome |
+| -- | Trash auto-trash #2 | GCloud Alerting (19c260bb68d77d12) | Read+Trashed via Chrome |
+
+### New Senders Added
+- Dub.co (steven@ship.dub.co) -> Keep: "Welcome to Dub Partners" onboarding email, transactional account activation (similar to Starlink welcome), not marketing
+
+### Email Details (newest first)
+1. Google Cloud Alerting (alerting-noreply@google.com) -> **auto-trash** (memory match, Firebase RTDB billing alert) -- TRASHED
+2. Google Cloud Alerting (alerting-noreply@google.com) -> **auto-trash** (memory match, Firebase RTDB billing alert) -- TRASHED
+3. Dub.co (steven@ship.dub.co) -> **keep** (new sender, partner program welcome/onboarding, CATEGORY_UPDATES, transactional)
+4-16. Already classified in Sessions 23-34 (skipped via dedup)
+
+### Pending Actions
+- None (all actions executed immediately via Chrome)
+
+### Errors
+- None
+
+### Notes
+- Chrome available and working -- 14th consecutive Chrome session (S22-S35)
+- 1 new keep sender: Dub.co (ship.dub.co) - affiliate partner program welcome email, transactional onboarding
+- Dub.co email has unsubscribe link for product updates (monthly), but the welcome email itself is transactional = keep
+- Google Cloud Alerting x2: auto-trash per memory pattern (Firebase RTDB billing alerts)
+- Trash button at (421, 88) confirmed working reliably
+- Total emails processed all-time: ~1164+
+
+---
+
+## Session 34 (2026-02-04)
+
+**Status:** Completed
+**Date:** 2026-02-04
+**Emails scanned:** 19 (last 48 hours, `newer_than:2d`), 2 new after dedup
+**Chrome available:** Yes
+
+### Classifications
+| Category | Count |
+|----------|-------|
+| Keep | 0 (new) |
+| Low-priority | 0 (new) |
+| Marketing | 1 (new) |
+| Auto-trash | 1 (new) |
+
+### Actions Taken
+| Time | Action | Target | Result |
+|------|--------|--------|--------|
+| -- | Verify Chrome | tabs_context_mcp | Connected (9 tabs, Gmail already open) |
+| -- | Check pending actions | pending-actions.json | No file found (none pending) |
+| -- | Scan unread (last 48h) | `is:unread newer_than:2d` | 19 emails found, 2 new after dedup |
+| -- | Classify 2 new emails | Inbox (newest first) | Completed (1 marketing + 1 auto-trash) |
+| -- | Trash marketing #1 | ButcherCrowd (19c253303daea3fc) | Read+Trashed via Chrome |
+| -- | Trash auto-trash #1 | GCloud Alerting (19c2529508adbaf9) | Read+Trashed via Chrome |
+
+### New Senders Added
+- ButcherCrowd (support@butchercrowd.com.au) -> Marketing: meat subscription "$480 welcome offer", CATEGORY_PROMOTIONS, Klaviyo platform
+
+### Email Details (newest first)
+1. ButcherCrowd (support@butchercrowd.com.au) -> **marketing** (new sender, "$480 welcome offer", CATEGORY_PROMOTIONS, Klaviyo unsubscribe) -- TRASHED
+2. Google Cloud Alerting (alerting-noreply@google.com) -> **auto-trash** (memory match, Firebase RTDB billing alert) -- TRASHED
+3-19. Already classified in Sessions 23-33 (skipped via dedup)
+
+### Pending Actions
+- None (all actions executed immediately via Chrome)
+
+### Errors
+- None
+
+### Notes
+- Chrome available and working -- 13th consecutive Chrome session (S22-S34)
+- 1 new marketing sender: ButcherCrowd (butchercrowd.com.au) - food subscription marketing via Klaviyo
+- Klaviyo pattern added to Learned Patterns (kmail-lists.com unsubscribe links)
+- Trash button at (421, 88) confirmed working reliably
+- Total emails processed all-time: ~1161+
+
+---
+
+## Session 33 (2026-02-04)
+
+**Status:** Completed
+**Date:** 2026-02-04
+**Emails scanned:** 18 (last 48 hours, `newer_than:2d`), 1 new after dedup
+**Chrome available:** Yes
+
+### Classifications
+| Category | Count |
+|----------|-------|
+| Keep | 0 (new) |
+| Low-priority | 0 (new) |
+| Marketing | 1 (new) |
+| Auto-trash | 0 (new) |
+
+### Actions Taken
+| Time | Action | Target | Result |
+|------|--------|--------|--------|
+| -- | Verify Chrome | tabs_context_mcp | Connected (9 tabs, Gmail already open) |
+| -- | Check pending actions | pending-actions.json | No file found (none pending) |
+| -- | Scan unread (last 48h) | `is:unread newer_than:2d` | 18 emails found, 1 new after dedup |
+| -- | Classify 1 new email | Inbox (newest first) | Completed (1 marketing) |
+| -- | Trash marketing #1 | UBS KeyClub (19c23c4de9a658f2) | Read+Trashed via Chrome |
+
+### New Senders Added
+- None (UBS KeyClub already on Always Unsubscribe list from earlier sessions)
+
+### Email Details (newest first)
+1. UBS KeyClub (ubs_switzerland@mailing.ubs.com) -> **marketing** (memory match, KeyClub benefits/discount promos, hotel deals, sports tickets, CATEGORY_UPDATES but promotional content) -- TRASHED
+2-18. Already classified in Sessions 23-32 (skipped via dedup)
+
+### Pending Actions
+- None (all actions executed immediately via Chrome)
+
+### Errors
+- None
+
+### Notes
+- Chrome available and working -- 12th consecutive Chrome session (S22-S33)
+- Only 1 new email since Session 32: UBS KeyClub marketing (mailing.ubs.com)
+- UBS KeyClub: already on Always Unsubscribe list, content is clearly promotional (hotel discounts, sports tickets, family offers)
+- Trash button at (421, 88) confirmed working reliably
+- Total emails processed all-time: ~1159+
+
+---
+
+## Session 32 (2026-02-04)
+
+**Status:** Completed
+**Date:** 2026-02-04
+**Emails scanned:** 20 (last 48 hours, `newer_than:2d`), 3 new after dedup
+**Chrome available:** Yes
+
+### Classifications
+| Category | Count |
+|----------|-------|
+| Keep | 0 (new) |
+| Low-priority | 0 (new) |
+| Marketing | 1 (new) |
+| Auto-trash | 2 (new) |
+
+### Actions Taken
+| Time | Action | Target | Result |
+|------|--------|--------|--------|
+| -- | Verify Chrome | tabs_context_mcp | Connected (9 tabs, Gmail already open) |
+| -- | Check pending actions | pending-actions.json | No file found (none pending) |
+| -- | Scan unread (last 48h) | `is:unread newer_than:2d` | 20 emails found, 3 new after dedup |
+| -- | Classify 3 new emails | Inbox (newest first) | Completed (2 auto-trash + 1 marketing) |
+| -- | Trash auto-trash #1 | GCloud Alerting (19c22f8659e246cc) | Read+Trashed via Chrome |
+| -- | Trash auto-trash #2 | GCloud Alerting (19c22f09004d8b88) | Read+Trashed via Chrome |
+| -- | Trash marketing #1 | Caluga Farm Store (19c22c0351944a75) | Read+Trashed via Chrome |
+
+### New Senders Added
+- None (all matched existing memory patterns)
+
+### Email Details (newest first)
+1. Google Cloud Alerting (alerting-noreply@google.com) -> **auto-trash** (memory match, Firebase RTDB billing alert) -- TRASHED
+2. Google Cloud Alerting (alerting-noreply@google.com) -> **auto-trash** (memory match, Firebase RTDB billing alert) -- TRASHED
+3. Caluga Farm Store (info@calugafarmstore.com.au) -> **marketing** (memory match, "Our Ledger Is Half Full Already!" newsletter, CATEGORY_PROMOTIONS) -- TRASHED
+4-20. Already classified in Sessions 23-31 (skipped via dedup)
+
+### Pending Actions
+- None (all actions executed immediately via Chrome)
+
+### Errors
+- None
+
+### Notes
+- Chrome available and working -- 11th consecutive Chrome session (S22-S32)
+- All 3 emails matched existing memory patterns (no new senders)
+- Caluga Farm Store: already on Always Unsubscribe list from Session 12
+- Google Cloud Alerting x2: auto-trash (Firebase RTDB billing alerts)
+- Trash button at (421, 88) confirmed working reliably
+- Total emails processed all-time: ~1158+
+
+---
+
+## Session 31 (2026-02-03)
+
+**Status:** Completed
+**Date:** 2026-02-03
+**Emails scanned:** 21 (last 48 hours, `newer_than:2d`), 4 new after dedup
+**Chrome available:** Yes
+
+### Classifications
+| Category | Count |
+|----------|-------|
+| Keep | 0 (new) |
+| Low-priority | 0 (new) |
+| Marketing | 3 (new) |
+| Auto-trash | 1 (new) |
+
+### Actions Taken
+| Time | Action | Target | Result |
+|------|--------|--------|--------|
+| -- | Verify Chrome | tabs_context_mcp | Connected (9 tabs, Gmail already open) |
+| -- | Check pending actions | pending-actions.json | No file found (none pending) |
+| -- | Scan unread (last 48h) | `is:unread newer_than:2d` | 21 emails found, 4 new after dedup |
+| -- | Classify 4 new emails | Inbox (newest first) | Completed (1 auto-trash + 3 marketing) |
+| -- | Trash marketing #1 | Temu (19c22550049c8e6e) | Read+Trashed via Chrome |
+| -- | Trash auto-trash #1 | GCloud Alerting (19c22365cf7b83ac) | Read+Trashed via Chrome |
+| -- | Trash marketing #2 | SEEK Jobmail (19c221744c6c3dc7) | Read+Trashed via Chrome |
+| -- | Trash marketing #3 | Velocity Frequent Flyer (19c21e7a892aeff6) | Read+Trashed via Chrome |
+
+### New Senders Added
+- SEEK Jobmail (jobmail@s.seek.com.au) -> Marketing: "Save your searches" promo, distinct from noreply@s.seek.com.au application confirmations (keep)
+- Velocity Frequent Flyer (velocity@e.velocityfrequentflyer.com) -> Marketing: Virgin Australia loyalty program promos, CATEGORY_PROMOTIONS
+
+### Email Details (newest first)
+1. Temu (email@market.temuemail.com) -> **marketing** (memory match, "3 gifts to claim in 24h" spam) -- TRASHED
+2. Google Cloud Alerting (alerting-noreply@google.com) -> **auto-trash** (memory match, Firebase RTDB billing alert) -- TRASHED
+3. SEEK Jobmail (jobmail@s.seek.com.au) -> **marketing** (new sender, "Save your searches" promo, unsubscribe link) -- TRASHED
+4. Velocity Frequent Flyer (velocity@e.velocityfrequentflyer.com) -> **marketing** (new sender, Valentine's Day bonus Points promo, CATEGORY_PROMOTIONS) -- TRASHED
+5-21. Already classified in Sessions 23-30 (skipped via dedup)
+
+### Pending Actions
+- None (all actions executed immediately via Chrome)
+
+### Errors
+- None
+
+### Notes
+- Chrome available and working -- 10th consecutive Chrome session (S22-S31)
+- 2 new marketing senders discovered: SEEK Jobmail and Velocity Frequent Flyer
+- SEEK sender split now complete: jobmail@s.seek.com.au = marketing, noreply@s.seek.com.au = keep (applications)
+- Velocity Frequent Flyer: Virgin Australia loyalty program, clearly promotional (bonus Points offer)
+- Temu and Google Cloud Alerting: existing memory matches
+- Trash button at (421, 88) confirmed working reliably
+- Total emails processed all-time: ~1155+
+
+---
+
 ## Session 30 (2026-02-03)
 
 **Status:** Completed

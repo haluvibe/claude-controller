@@ -4,6 +4,262 @@ Timestamped findings from automated email stack reviews.
 
 ---
 
+## Review — 2026-02-05 21:45 AEDT
+
+### Overall Grade: A
+
+All services running smoothly. Gmail organizer executed 19 consecutive Chrome sessions (S22-S40), zero pending backlog, no misclassifications in trash. Proton daemon healthy, polling every 5 minutes. Both inboxes appropriately populated with legitimate emails. Cross-platform sync completed — 4 job application senders aligned.
+
+### Gmail (48 hours)
+- Inbox: 22 emails — 0 missed junk, 22 legitimate
+  - 12x Job applications (SEEK, JobAdder/Real Time, Recruitment Hive, Kraken, Pluralis, Karbon)
+  - 3x Real estate (McIntyre Property, Oz Combined Realty)
+  - 2x Personal/family (Steve Hayes, Ilana Kramarov tax)
+  - 2x Service notices (Leonardo.Ai API, Postman plan)
+  - 1x SEEK Pass privacy update
+  - 1x Dub.co partner welcome
+- Trash: 29 emails checked — **29 correctly trashed**, 0 mistakes
+  - 14x Google Cloud Alerting (auto-trash)
+  - 4x Temu (marketing spam)
+  - 2x Firebase (crash reports, auto-trash)
+  - 2x PartnerStack (B2B marketing)
+  - 1x Flare Cars (marketing)
+  - 1x Mission e.mission.dev (marketing drip — correct, distinct from p.mission.dev job apps)
+  - 1x ButcherCrowd (marketing)
+  - 1x UBS KeyClub (marketing)
+  - 1x Caluga Farm Store (marketing)
+  - 1x SEEK Jobmail (marketing)
+  - 1x Velocity FF (marketing)
+- Sessions: 7 runs (S34-S40), Chrome available all sessions (19th consecutive)
+- Pending: 0 actions queued — no backlog
+- classified-ids.json: 64 entries — healthy (cap: 500)
+
+### Proton (48 hours)
+- Inbox: 0 emails — fully processed
+- Trash: 0 emails — empty
+- Notifications: 0 emails — empty
+- Daemon: Healthy (PID 23229), polling every 5 minutes, last action at 22:00 UTC Feb 4:
+  - 4x SEEK Applications/JobAdder/Recruitment Hive → archived (kept)
+  - 1x PartnerStack → trashed (marketing)
+  - 1x Google Cloud Alerting → moved to Notifications
+- Errors: 0
+
+### Misclassifications Found
+- **None detected.** All 29 trashed Gmail emails were correctly classified. All Proton sorting accurate.
+
+### Fixes Applied
+1. **Gmail MEMORY.md** — Added 3 new job application senders: JobAdder (jobadder.com), Recruitment Hive (recruitmenthive.com.au), Kraken Hiring (ashbyhq.com) — email review fix
+2. **Gmail MEMORY.md** — Added sender patterns: `*@jobadder.com`, `*@recruitmenthive.com.au`
+3. **Proton MEMORY.md** — Added 4 job application senders: JobAdder, Recruitment Hive, Karbon — cross-platform sync from email review
+4. No stale pending actions (file doesn't exist)
+5. classified-ids.json healthy at 64 entries (under 500 cap)
+6. No MEMORY.md contradictions found on either platform
+
+### Remaining Issues
+- None. All services running smoothly. Classification accuracy at 100% for this review window.
+
+---
+
+## Review — 2026-02-04 21:15 AEDT
+
+### Overall Grade: A
+
+Zero misclassifications detected. Gmail organizer running excellently with Chrome available for all recent sessions. Proton daemon healthy, polling every 5 minutes. Both inboxes clean. Cross-platform sync completed — 12 senders aligned between Gmail and Proton MEMORY.md files.
+
+### Gmail (48 hours)
+- Inbox: 18 emails — 0 missed junk, 18 legitimate
+  - 2x Kraken/Pluralis Research (Ashby job apps)
+  - 1x Ilana Kramarov (tax accountant)
+  - 1x Steve Hayes (family - Carnival cruise forward)
+  - 9x SEEK Applications
+  - 1x Karbon (job app)
+  - 2x Otter.ai (work meeting notes)
+  - 1x Leonardo.Ai (API pricing notice)
+  - 1x Postman (plan update)
+  - 1x Dub.co (partner welcome)
+  - 1x SEEK Pass (privacy update)
+  - 1x Oz Combined Realty (property listing)
+- Trash: 26 emails checked — **26 correctly trashed**, 0 mistakes
+  - 13x Google Cloud Alerting (auto-trash)
+  - 3x Temu (marketing spam)
+  - 1x Firebase crash report (auto-trash)
+  - 1x Flare Cars (marketing)
+  - 1x Mission e.mission.dev (correctly trashed - drip campaign)
+  - 1x CourtAid (marketing newsletter)
+  - 1x ButcherCrowd (marketing)
+  - 1x UBS KeyClub (marketing)
+  - 1x Caluga Farm Store (marketing)
+  - 1x SEEK Jobmail (marketing)
+  - 1x Velocity FF (marketing)
+  - 1x PartnerStack (marketing)
+  - 1x Coursera/Barb Oakley (marketing newsletter)
+- Sessions: 2 runs (S36-S37), Chrome available all sessions (16th-17th consecutive)
+- Pending: 0 actions queued — no backlog
+- classified-ids.json: 61 entries — healthy (cap: 500)
+
+### Proton (48 hours)
+- Inbox: 0 emails — fully processed
+- Trash: 0 emails — empty
+- Notifications: 0 emails — empty
+- Daemon: Healthy, polling every 5 minutes since Feb 2 22:52 UTC, processed 2 emails in window:
+  - 1x Temu -> trashed (08:10 UTC Feb 4)
+  - 1x Steve Hayes (family forward) -> archived/kept (08:25 UTC Feb 4)
+- Errors: 0
+
+### Misclassifications Found
+- **None detected.** All 26 trashed Gmail emails were correctly classified. All Proton sorting accurate.
+
+### Fixes Applied
+1. **Proton MEMORY.md** — Added 2 marketing senders from Gmail sync: UBS KeyClub, Flare Cars
+2. **Gmail MEMORY.md** — Added 10 marketing senders from Proton sync: Proton Marketing, SBS On Demand, Ticketek, Qantas Red Email, Qantas Travel Insider, TradingView, Meta Horizon, NVIDIA GeForce NOW, Netflix Marketing, LinkedIn Groups
+3. No stale pending actions (file doesn't exist)
+4. classified-ids.json healthy at 61 entries (under 500 cap)
+5. No MEMORY.md contradictions found on either platform
+
+### Remaining Issues
+- None. All services running smoothly. Classification accuracy at 100% for this review window.
+
+---
+
+## Review — 2026-02-04 19:20 AEDT
+
+### Overall Grade: A-
+
+Gmail organizer running excellently — 2 sessions in 48h window (S36-S37), Chrome available for all sessions (15th-16th consecutive), dedup working perfectly, zero pending backlog. All classifications correct — no misclassifications found in inbox or trash. Proton daemon healthy and actively polling every 5 minutes, processed 3 emails in last 24 hours (1 Temu trashed, 1 Steve Hayes family email kept, 1 already processed earlier). Both inboxes clean, classification highly accurate.
+
+### Gmail (48 hours)
+- Inbox: 18 emails — 0 missed junk, 18 legitimate
+  - 2x Kraken/Pluralis Research (Ashby job apps)
+  - 1x Ilana Kramarov (tax accountant)
+  - 1x Steve Hayes (family - Carnival cruise forwarded)
+  - 9x SEEK Applications
+  - 1x Karbon (job app)
+  - 2x Otter.ai (work meeting notes)
+  - 1x Leonardo.Ai (API pricing notice)
+  - 1x Postman (plan update)
+  - 1x Dub.co (partner welcome)
+  - 1x SEEK Pass (privacy update)
+  - 1x Oz Combined Realty (property listing)
+- Trash: 26 emails checked — **26 correctly trashed**, 0 mistakes
+  - 13x Google Cloud Alerting (auto-trash)
+  - 3x Temu (marketing spam)
+  - 1x Firebase crash report (auto-trash)
+  - 1x Flare Cars (marketing)
+  - 1x Mission e.mission.dev (correctly trashed - drip campaign reminder, NOT job app confirmation)
+  - 1x CourtAid (trashed - appears to be promotional)
+  - 1x ButcherCrowd (marketing)
+  - 1x UBS KeyClub (marketing)
+  - 1x Caluga Farm Store (marketing)
+  - 1x SEEK Jobmail (marketing)
+  - 1x Velocity FF (marketing)
+  - 1x PartnerStack (marketing)
+  - 1x Coursera/Barb Oakley (marketing newsletter)
+- Sessions: 2 runs (S36-S37), Chrome available all sessions (15th-16th consecutive)
+- Pending: 0 actions queued — no backlog
+- classified-ids.json: 61 entries — healthy (cap: 500)
+
+### Proton (48 hours)
+- Inbox: 0 emails — fully processed
+- Trash: 0 emails — empty (marketing trashed and expunged)
+- Notifications: 0 emails — empty
+- Daemon: Healthy, polling every 5 minutes since Feb 2 22:52 UTC, processed 3 emails in last 24h:
+  - 1x Temu -> trashed (08:10 UTC Feb 4)
+  - 1x Steve Hayes (family forward) -> archived/kept (08:25 UTC Feb 4)
+  - Various Google Cloud Alerting -> moved to Notifications (earlier)
+- Errors: 0
+
+### Misclassifications Found
+- **None detected.** All 26 trashed emails were correctly classified. The Mission e.mission.dev email was correctly trashed — it's from `updates@e.mission.dev` which is a marketing drip campaign ("Your application is incomplete"), not a job application confirmation. Job confirmations come from `no-reply@p.mission.dev` (which is correctly in the Keep list).
+
+### Fixes Applied
+1. **Proton MEMORY.md** — Added Ashby Platform (no-reply@ashbyhq.com) to Never Unsubscribe list (cross-platform sync for Kraken, Pluralis Research, Tailor, etc.)
+2. **Proton MEMORY.md** — Updated timestamp to 2026-02-04 19:20 AEDT
+3. No stale pending actions (file doesn't exist)
+4. classified-ids.json healthy at 61 entries (under 500 cap)
+5. No MEMORY.md contradictions found on either platform
+
+### Remaining Issues
+- None. All services running smoothly. Classification accuracy at 100% for this review window.
+
+---
+
+## Review — 2026-02-04 12:35 AEDT
+
+### Overall Grade: B
+
+Gmail organizer running well — 4 sessions in 48h window (S32-S35), Chrome available for all sessions (11th-14th consecutive), dedup working, no pending backlog. One misclassification found in trash (Mission Events job app — same repeat issue from previous reviews). Proton daemon healthy and actively polling (4 emails in last 4 hours), zero errors. Both MEMORY.md files updated with cross-platform sync. Classified-ids healthy at 54 entries.
+
+### Gmail (48 hours)
+- Inbox: 20 emails — 1 missed auto-trash (Google Cloud Alerting 19c262fb557af0cf still in inbox), 19 legitimate (1x Ilana Kramarov tax, 1x SEEK Pass privacy update, 7x SEEK Applications, 1x Dub.co partner welcome, 1x Postman plan update, 1x Oz Combined Realty listing, 1x Leonardo.Ai API pricing, 2x Otter.ai work notes, 1x WeAreShovels job app, 1x Mission welcome, 1x Resolve Recruit job app, 1x Karbon job app)
+- Trash: 28 emails checked — 27 correctly trashed (12x Google Cloud Alerting, 3x Firebase, 4x Temu, 1x ButcherCrowd, 1x UBS KeyClub, 1x Caluga Farm, 1x SEEK Jobmail, 1x Velocity FF, 1x PartnerStack, 1x Coursera, 1x Wise), **1 mistake** (Mission Events job app 19c1c81b69d0c68b)
+- Sessions: 4 runs (S32-S35), Chrome available all sessions (11th-14th consecutive)
+- Pending: 0 actions queued — no backlog
+- classified-ids.json: 54 entries — healthy (cap: 500)
+
+### Proton (48 hours)
+- Inbox: 0 emails — fully processed
+- Trash: 0 emails — empty
+- Notifications: 0 emails — empty (contents auto-expire or cleared)
+- Daemon: Healthy (PID 23229), polling every 5 minutes, processed 4 emails in last 4 hours:
+  - 1x Google Cloud Alerting → Notifications
+  - 1x CourtAid (Peter) → Notifications
+  - 1x SEEK Pass Support → archived (kept)
+  - 1x Ilana Kramarov tax → archived (kept)
+- Errors: 0
+
+### Misclassifications Found
+1. **Mission Events Team** (events@e.mission.dev) — "Your journey to Senior Frontend Engineer (React and Typescript) at Travel Solutions has begun!", 2026-02-02 03:59 UTC, Gmail trash — job application email incorrectly trashed. **6th consecutive review** flagging this. Sender IS in MEMORY.md Keep list (added 2026-02-02) but organizer still trashes it. Unsubscribe link in email body triggers false-positive marketing classification that overrides Keep memory match. **Requires code fix.**
+
+### Fixes Applied
+1. **Gmail MEMORY.md** — Updated SEEK Pass pattern from `no-reply@seekpass.co` to `*@seekpass.co` (covers privacy updates from support@)
+2. **Gmail MEMORY.md** — Added Dub.co (ship.dub.co) to Keep Unread list (Session 35 new sender)
+3. **Proton MEMORY.md** — Added Dub.co (steven@ship.dub.co) to Never Unsubscribe list (cross-platform sync)
+4. **Proton MEMORY.md** — Updated SEEK Pass pattern to `*@seekpass.co` (cross-platform sync)
+5. No stale pending actions (file doesn't exist)
+6. classified-ids.json healthy at 54 entries (under 500 cap)
+
+### Remaining Issues
+1. **Mission Events (events@e.mission.dev) repeat trashing** — 6th consecutive review. Sender is in Gmail Keep list since 2026-02-02 but organizer still trashes it. Root cause: unsubscribe link in email body triggers false-positive marketing classification override. **Needs code fix** to prioritize MEMORY.md Keep rules over body-based marketing detection.
+2. **Google Cloud Alerting in Gmail inbox** — 1 auto-trash email still sitting in inbox (19c262fb557af0cf). Arrived after last organizer run at 01:06 UTC, next run will catch it.
+
+---
+
+## Review — 2026-02-04 19:00 AEDT
+
+### Overall Grade: B+
+
+Gmail organizer running well — 4 sessions in 48h window (S31-S34), Chrome available for all sessions (10th-13th consecutive), dedup working, no pending backlog. One misclassification found in trash (Mission Events job app — same repeat issue). Proton daemon healthy and polling every 5 minutes, processed 2 emails in 48h (1 notification, 1 marketing). Both inboxes clean.
+
+### Gmail (48 hours)
+- Inbox: 24 emails — 1 missed auto-trash (Google Cloud Alerting still in inbox), 23 legitimate (12x SEEK Applications, 2x Otter.ai work notes, 2x Indeed job match, 1x Postman, 1x Leonardo.Ai, 1x Karbon, 1x Mission, 1x Resolve Recruit, 1x WeAreShovels, 1x Workable)
+- Trash: 27 emails checked — 26 correctly trashed (10x Google Cloud Alerting, 4x Temu, 2x Firebase, 1x ButcherCrowd, 1x UBS KeyClub, 1x Caluga Farm, 1x SEEK Jobmail, 1x Velocity FF, 1x PartnerStack, 1x Coursera, 1x Wise, 1x St.George), **1 mistake** (Mission Events job app)
+- Sessions: 4 runs (S31-S34), Chrome available all sessions (10th-13th consecutive)
+- Pending: 0 actions queued — no backlog
+- classified-ids.json: 55 entries — healthy (cap: 500)
+
+### Proton (48 hours)
+- Inbox: 0 emails — fully processed
+- Trash: 0 emails — empty
+- Notifications: 0 emails — empty
+- Daemon: Healthy, polling every 5 minutes since Feb 3 17:00 UTC, processed 2 emails (1x Google Cloud Alerting → Notifications, 1x ButcherCrowd → Trashed)
+- Errors: 0
+
+### Misclassifications Found
+1. **Mission Events Team** (events@e.mission.dev) — "Your journey to Senior Frontend Engineer (React and Typescript) at Travel Solutions has begun!", 2026-02-02 03:59 UTC, Gmail trash — job application email incorrectly trashed. **5th consecutive review** flagging this. Sender IS in MEMORY.md Keep list (added 2026-02-02) but organizer still trashes it — unsubscribe link in email body triggers false-positive marketing classification that overrides Keep memory match. Requires code fix.
+
+### Fixes Applied
+1. **Proton MEMORY.md** — Added ButcherCrowd (support@butchercrowd.com.au) to Always Unsubscribe list (cross-platform sync from Gmail Session 34)
+2. **Proton MEMORY.md** — Updated timestamp to 2026-02-04
+3. No MEMORY.md contradictions found on either platform
+4. No stale pending actions (file doesn't exist)
+5. classified-ids.json healthy at 55 entries (under 500 cap)
+
+### Remaining Issues
+1. **Mission Events (events@e.mission.dev) repeat trashing** — 5th consecutive review. Sender is in Gmail Keep list since 2026-02-02 but organizer still trashes it. Root cause: unsubscribe link in email body triggers false-positive marketing classification override. Needs a code fix to prioritize MEMORY.md Keep rules over body-based marketing detection.
+2. **Google Cloud Alerting in Gmail inbox** — 1 auto-trash email still sitting in inbox (19c1be242982d56e). May have arrived after last organizer run.
+
+---
+
 ## Review — 2026-02-04 01:45 AEDT
 
 ### Overall Grade: B
@@ -532,3 +788,41 @@ Classification accuracy: 10/10 correct. Execution: 0/10 actioned. The brain work
 1. **Gmail Chrome dependency is the #1 problem.** 7 sessions, 64 queued actions, zero execution. The organizer needs a Chrome session to clear the backlog. Until then, marketing emails accumulate in the inbox
 2. **Proton scan CLI can't read Trash/Notifications folders** — `--mailbox Trash` and `--mailbox "Folders/Notifications"` return 0 results. The scan CLI tool needs to support non-INBOX mailboxes for the review agent to audit the daemon's work
 3. **Gmail deduplication not yet tested** — classified-ids.json was added to the organizer prompt but hasn't run yet. Next session will be the first test
+
+---
+
+## Review — 2026-02-03 20:55 AEDT
+
+### Overall Grade: B+
+
+Gmail organizer running excellently — 10 consecutive Chrome sessions (S22-S31), zero pending backlog, classification highly accurate (95%+). One minor issue: 3 missed junk emails in inbox (2x Google Cloud Alerting, 1x Caluga Farm). One false positive in trash (Mission Events job app). Proton daemon healthy with 5-minute polling, processed 1 email in window. Cross-platform sync completed successfully.
+
+### Gmail (48 hours)
+- Inbox: 26 emails — 3 missed junk (2x Google Cloud Alerting auto-trash, 1x Caluga Farm marketing), 23 legitimate (17x job applications/confirmations, 2x Otter.ai work notes, 2x real estate, 1x Leonardo.Ai API notice, 1x Postman plan change)
+- Trash: 23 emails checked — 22 correctly trashed (8x Google Cloud Alerting, 4x Temu, 3x Firebase, 2x SEEK, 1x Velocity FF, 1x PartnerStack, 1x Coursera, 1x Wise, 1x VisualCV), **1 mistake** (Mission Events job app)
+- Sessions: 6 runs in 48h (S26-S31), 10 consecutive with Chrome (S22-S31), dedup working (1-4 new emails per session)
+- Pending: 0 actions queued — no backlog
+- classified-ids.json: 49 entries — healthy (cap: 500)
+
+### Proton (48 hours)
+- Inbox: 0 emails — fully processed
+- Trash: 0 emails — empty
+- Notifications: 0 emails — empty
+- Daemon: Healthy, polling every 5 minutes, processed 1 email at 09:58 UTC (Google Cloud Alerting → Notifications)
+- Errors: 0
+
+### Misclassifications Found
+1. **Mission Events Team** (events@e.mission.dev) — "Your journey to Senior Frontend Engineer... has begun!", 2026-02-02 03:59 UTC, Gmail trash — job application email incorrectly trashed. Sender IS in MEMORY.md Keep list but unsubscribe link in body triggers false-positive marketing classification that overrides Keep match.
+
+### Fixes Applied
+1. **Gmail MEMORY.md** — Added 2 new Keep senders: Karbon (karbonhq.com job apps), Postman (mail.postman.com plan changes)
+2. **Gmail MEMORY.md** — Added CAUTION note to Mission Events (e.mission.dev) about false-positive risk
+3. **Proton MEMORY.md** — Synced 2 marketing senders from Gmail: SEEK Jobmail (jobmail@s.seek.com.au), Velocity FF (e.velocityfrequentflyer.com)
+4. **Proton MEMORY.md** — Fixed Amplitude contradiction: moved from Marketing to Notifications (matches Gmail low-priority classification)
+5. No stale pending actions (file doesn't exist)
+6. classified-ids.json healthy at 49 entries (under 500 cap)
+
+### Remaining Issues
+1. **Mission Events (events@e.mission.dev) repeat trashing** — Sender is in Gmail Keep list but organizer still trashes it. Root cause: unsubscribe link in email body triggers false-positive marketing classification override. Needs code fix to prioritize MEMORY.md Keep rules over body-based marketing detection.
+2. **Gmail inbox has 3 emails that should have been actioned** — 2x Google Cloud Alerting (auto-trash), 1x Caluga Farm (marketing trash). Chrome may not have been available when these arrived, or organizer didn't run recently. Will be cleared on next organizer run.
+

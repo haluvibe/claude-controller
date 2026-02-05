@@ -83,7 +83,31 @@ Record the `id` of every email classified as marketing, auto-trash, or low-prior
 
 Read each email with `mcp__gmail__gmail_read_message` **in order from most recent to least recent** and classify it.
 
-### Marketing Indicators (score-based, unsubscribe if score >= 4)
+### STEP 2a: Memory Override (CHECK FIRST — MANDATORY)
+
+**CRITICAL: Check MEMORY.md BEFORE applying any scoring rules. Memory rules are HARD OVERRIDES that short-circuit all other classification logic.**
+
+Check the sender's email address and domain against MEMORY.md in this order:
+
+1. **Keep Unread list / Never Unsubscribe / Trusted Senders → classify as "keep" IMMEDIATELY**
+   - If sender matches ANY pattern in these lists, classify as "keep" and STOP
+   - Do NOT apply marketing indicators, do NOT score, do NOT check body for unsubscribe links
+   - The match can be exact (`events@e.mission.dev`) or wildcard (`*@e.mission.dev`)
+
+2. **Auto-Trash list → classify as "auto-trash" IMMEDIATELY**
+   - Skip reading, just trash
+
+3. **Auto-Read + Archive list → classify as "low-priority" IMMEDIATELY**
+   - Mark read and archive
+
+4. **Always Unsubscribe list → classify as "marketing" IMMEDIATELY**
+   - Score 10 (auto-qualifies for trash)
+
+5. **Needs Review list → ask user**
+
+**Only proceed to Step 2b (Marketing Indicators) if the sender is NOT in any MEMORY.md list.**
+
+### STEP 2b: Marketing Indicators (score-based, unsubscribe if score >= 4)
 
 **Sender patterns (+2):**
 - `no-reply@`, `noreply@`, `newsletter@`, `marketing@`, `promotions@`, `offers@`, `deals@`, `news@`, `updates@`

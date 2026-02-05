@@ -74,3 +74,34 @@ Running log of every job application session. Each entry records jobs processed,
 - Screenshot permission denied once (user misclick) — re-requested and granted
 
 ---
+
+## Session 3 — 2026-02-04 (LinkedIn)
+
+**Jobs processed:** 5
+**Source:** LinkedIn (search: Senior Frontend React, Remote, Past week)
+
+### Results
+| # | Company | Role | Action | Result |
+|---|---------|------|--------|--------|
+| 1 | Tailor | Senior Frontend Engineer (Australia - AEST, Remote) | Applied | LinkedIn → Ashby form, Y-Combinator backed, no cover letter field |
+| 2 | Pluralis Research | Senior / Staff Frontend Engineer | Applied | LinkedIn → Ashby form, USV-backed, custom questions answered |
+| 3 | Venus Labs | Frontend Engineer (DeFi / Web3 Protocol) | Applied | LinkedIn Easy Apply, DeFi/Web3 role, screening questions answered |
+| 4 | Kraken | Senior Software Engineer - Frontend - Onchain | Applied | LinkedIn → Ashby form, crypto exchange, custom questions answered |
+| 5 | BRG | Software Engineer | Skipped | Workday ATS requires account creation — cannot automate |
+
+### Cover Letters Generated
+- None (Ashby and LinkedIn Easy Apply forms had no cover letter field)
+
+### Platform Notes Learned
+- Ashby ATS (jobs.ashbyhq.com) is common for Y-Combinator startups — simple form with name, email, phone, resume, optional website
+- Ashby has no cover letter field, just custom questions
+- Workday ATS (*.wd5.myworkdayjobs.com) requires account creation — cannot automate (similar to SuccessFactors)
+- LinkedIn Apply button sometimes unresponsive to coordinate clicks — use `read_page` with `filter: interactive` to find ref and click by reference
+- LinkedIn pagination via URL parameter `start=N` works reliably (e.g., `start=25` for page 2)
+- Most "remote" jobs on SEEK/LinkedIn in Australia are actually hybrid (Sydney/Melbourne office required)
+
+### Errors
+- LinkedIn Apply button required ref-based click instead of coordinate click
+- Many jobs labeled "remote" were actually hybrid — extensive filtering required
+
+---
